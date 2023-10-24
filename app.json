@@ -21,10 +21,17 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.leoganz.fastestx"
     },
+    "scheme": "fastestx",
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "d5d3d1b2-7849-431a-9eee-1b0695aa22e3"
+      }
     }
   }
 }
