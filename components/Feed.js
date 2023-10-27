@@ -54,12 +54,9 @@ export default function Feed(props) {
     return (
         <>
             {(loading && activities.length === 0) ?
-			<View style={{justifyContent: "space-between", height: "94%"}}>
-                <ActivityIndicator style={{marginTop: 16}} size='large' color="black"/>
-            </View> :
+            <ActivityIndicator style={{marginTop: 16}} size='large' color="black"/>:
             <FlatList
                 data={activities}
-                style={{height: "95%"}}
                 renderItem={renderItem}
                 keyExtractor={item => item.id}
                 keyboardDismissMode={'onDrag'}
@@ -78,11 +75,11 @@ export default function Feed(props) {
                                 selectionColor='#fc5200'
                                 inputMode={"numeric"}
                                 onChangeText={text => {
-                                var number = text.replace(/[^0-9]/g, '')
-                                isNaN(number) ?
-                                    setDistanceMeasure(0) :
-                                    setTimeMeasure('')
-                                    setDistanceMeasure(number)
+                                    var number = text.replace(/[^0-9]/g, '')
+                                    isNaN(number) ?
+                                        setDistanceMeasure(0) :
+                                        setTimeMeasure('')
+                                        setDistanceMeasure(number)
                                 }}
                                 value={distanceMeasure.toString()}
                             />
@@ -95,11 +92,11 @@ export default function Feed(props) {
                             selectionColor='#fc5200'
                             inputMode={"numeric"}
                             onChangeText={text => {
-                            var number = text.replace(/[^0-9]/g, '')
-                            isNaN(number) ?
-                                setTimeMeasure('') :
-                                setDistanceMeasure('')
-                                setTimeMeasure(number)
+                                var number = text.replace(/[^0-9]/g, '')
+                                isNaN(number) ?
+                                    setTimeMeasure('') :
+                                    setDistanceMeasure('')
+                                    setTimeMeasure(number)
                             }}
                             value={timeMeasure.toString()}
                         />

@@ -8,10 +8,10 @@ import {
   LayoutAnimation
 } from "react-native";
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { FontAwesome } from '@expo/vector-icons'; 
 import { FontAwesome5 } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Linking from 'expo-linking';
+// import { ActivityMap } from './ActivityMap'
 
 export default function Activity(props) {
 
@@ -43,11 +43,6 @@ export default function Activity(props) {
 		if (distanceMeasure === 0 || timeMeasure === 0) {
 			setFastestDistance(trivial_winner)
 		} else if (!fastestDistance && distanceMeasure !== '0' && distanceMeasure !== '' && loading === false) {
-			if (distanceMeasure >= props.activity.distance) {
-				setFastestDistance(undefined)
-				return
-			}
-
 			setLoading(true)
 			const streams = await getStreams(props.activity.id)
 			const altitudeStream = streams.altitude?.data
@@ -55,6 +50,13 @@ export default function Activity(props) {
 			const timeStream = streams.time?.data
 			const heartrateStream = streams.heartrate?.data
 			let fastestSegment = trivial_winner
+
+			props.activity.total_elevation_gain = Math.round(altitudeStream?.reduce((acc, curr, id, arr) => curr > arr[id - 1] ? acc + curr - arr[id - 1] : acc + 0, 0))
+
+			if (distanceMeasure >= props.activity.distance) {
+				setFastestDistance(undefined)
+				return
+			}
 
 			if (distanceStream && timeStream) {
 				const distanceStreamUpperLimit = distanceStream.slice(-1) - distanceMeasure
@@ -82,7 +84,7 @@ export default function Activity(props) {
 
 					const relevantAltitudeStream = altitudeStream?.slice(fastestSegment.range.start, fastestSegment.range.end + 1)
 					fastestSegment.elevation = {
-						'gain': Math.round(relevantAltitudeStream?.reduce((acc, curr, id, arr) => curr - arr[id - 1] > 0.11 ? acc + curr - arr[id - 1] : acc + 0, 0)),
+						'gain': Math.round(relevantAltitudeStream?.reduce((acc, curr, id, arr) => curr > arr[id - 1] ? acc + curr - arr[id - 1] : acc + 0, 0)),
 						'loss': Math.round(relevantAltitudeStream?.reduce((acc, curr, id, arr) => curr < arr[id - 1] ? acc + arr[id - 1] - curr : acc + 0, 0))
 					}
 				}
@@ -193,11 +195,18 @@ export default function Activity(props) {
 								/>
 							}
 							{!isNaN(props.activity.average_speed) && props.activity.average_speed !== 0 &&
-								<Text
-									style={{display: "flex", textAlign: "center", fontSize: 22, fontWeight: 'bold'}}
-								>
-									[min/km]
-								</Text>
+								<>
+									<Text
+										style={{display: "flex", textAlign: "center", fontSize: 22, fontWeight: 'bold'}}
+									>
+										[min/km]
+									</Text>
+									<Text
+										style={{display: "flex", textAlign: "center", fontSize: 22, fontWeight: 'bold'}}
+									>
+										[km/h]
+									</Text>
+								</>
 							}
 							{!isNaN(props.activity.average_heartrate) && props.activity.average_heartrate !== 0 &&
 								<Text
@@ -236,14 +245,24 @@ export default function Activity(props) {
 								</Text>
 							}
 							{!isNaN(props.activity.average_speed) && props.activity.average_speed !== 0 &&
-								<Text 
-									style={[
-										styles.name, 
-										{textAlign: "center"}
-									]}
-								>
-									{`${timeInHoursAndMinutes(Math.round(1000 / props.activity.average_speed)).replace(' min', '').replace(' h', '')}`}
-								</Text>
+								<>
+									<Text 
+										style={[
+											styles.name, 
+											{textAlign: "center"}
+										]}
+									>
+										{`${timeInHoursAndMinutes(Math.round(1000 / props.activity.average_speed)).replace(' min', '').replace(' h', '')}`}
+									</Text>
+									<Text 
+										style={[
+											styles.name, 
+											{textAlign: "center"}
+										]}
+									>
+										{`${Math.round(props.activity.average_speed * 3.6 * 10) / 10}`}
+									</Text>
+								</>
 							}
 							{!isNaN(props.activity.average_heartrate) && props.activity.average_heartrate !== 0 &&
 								<Text 
@@ -262,7 +281,7 @@ export default function Activity(props) {
 										{textAlign: "center"}
 									]}
 								>
-									{`+${Math.round(props.activity.total_elevation_gain)}`}
+									{`+${props.activity.total_elevation_gain}`}
 								</Text>
 							}
 						</View>
@@ -341,6 +360,29 @@ export default function Activity(props) {
 							{`${timeInHoursAndMinutes(Math.round(1000 / props.activity.average_speed)).replace(' min', '').replace(' h', '')}`}
 						</Text>
 					</View>
+					<View style={[styles.modalLine, {display: "flex"}]}>
+						<Text 
+							style={[
+								styles.name,
+								{flex: 1, marginRight: "auto"}
+							]}
+						>
+							{`${Math.round((fastestDistance.end.distance - fastestDistance.start.distance) / (fastestDistance.end.time - fastestDistance.start.time) * 3.6 * 10) / 10}`}
+						</Text>
+						<Text
+							style={{display: "flex", alignItems: "center", fontSize: 22, fontWeight: 'bold'}}
+						>
+							[km/h]
+						</Text>
+						<Text
+							style={[
+								styles.name,
+								{textAlign: "right", flex: 1, marginLeft: "auto"}
+							]}
+						>
+							{`${Math.round(props.activity.distance / 10) / 100}`}
+						</Text>
+					</View>
 					{!isNaN(fastestDistance.heartrate) &&
 						<View style={[styles.modalLine, {display: "flex"}]}>
 							<Text 
@@ -391,6 +433,12 @@ export default function Activity(props) {
 							</Text>
 						</View>
 					}
+
+					{/* <View style={{width: "100%"}}>
+						<View style={styles.separator} />
+					</View>
+
+					<ActivityMap/> */}
 
 					<View style={{width: "100%"}}>
 						<View style={styles.separator} />

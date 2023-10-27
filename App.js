@@ -12,9 +12,10 @@ import { Image } from 'expo-image';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import * as WebBrowser from 'expo-web-browser';
-import { makeRedirectUri, useAuthRequest, exchangeCodeAsync } from 'expo-auth-session';
+import { makeRedirectUri, useAuthRequest, exchangeCodeAsync, TokenResponse, refreshAsync, revokeAsync } from 'expo-auth-session';
 import Feed from "./components/Feed";
 import * as SecureStore from 'expo-secure-store';
+import { AntDesign } from '@expo/vector-icons';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -32,27 +33,37 @@ export default function App() {
 	const [errorState, setErrorState] = useState('')
 
 	useEffect(() => {
-		console.log(credentials)
-		const getStoredCredentials = async () => await SecureStore.getItemAsync('credentials')
-		const storedCredentials = getStoredCredentials()
-		if (storedCredentials !== null) {
-			setCredentials(storedCredentials)
+		const checkStoredCredentials = async () => {
+			const isAvailable = async () => await SecureStore.isAvailableAsync('credentials')
+			const getStoredCredentials = async () => await SecureStore.getItemAsync('credentials')
+			const storedCredentials = JSON.parse(await getStoredCredentials())
+
+			if (await isAvailable() && storedCredentials !== null) {
+				if (!TokenResponse.isTokenFresh(storedCredentials)) {
+					const refreshedCredentials = await refreshAsync(
+						{clientId: '80072', refreshToken: storedCredentials.refreshToken},
+						discovery
+					)
+				
+					setCredentials(refreshedCredentials)
+					setLoggedIn(true)
+					return
+				}
+				setCredentials(storedCredentials)
+				setLoggedIn(true)
+			}
 		}
+
+		checkStoredCredentials()
 	}, [])
 
-	/* const [request, response, promptAsync] = useAuthRequest(
+	const [request, response, promptAsync] = useAuthRequest(
 		{
 			clientId: '80072',
 			scopes: ['activity:read_all'],
 			redirectUri: makeRedirectUri({
-				// For usage in bare and standalone
-				// the "redirect" must match your "Authorization Callback Domain" in the Strava dev console.
 				scheme: 'fastestx',
 				path: 'redirect'
-				// Development Build: my-scheme://redirect
-				// Expo Go: exp://127.0.0.1:8081/--/redirect
-				// Web dev: https://localhost:19006/redirect
-				// Web prod: https://yourwebsite.com/redirect
 			}),
 		},
 		discovery
@@ -63,18 +74,17 @@ export default function App() {
 			{
 				clientId: request?.clientId,
 				redirectUri: makeRedirectUri({
-					// For usage in bare and standalone
-					// the "redirect" must match your "Authorization Callback Domain" in the Strava dev console.
-				scheme: 'fastestx',
-				path: 'redirect'
-					// useProxy: true
-					// scheme: 'my-scheme',
-					// path: 'redirect'
+					scheme: 'fastestx',
+					path: 'redirect'
 				}),
 				code: response?.params.code,
 			},
 			discovery
 		)
+		
+		if (Platform.OS !== 'web') {
+			await SecureStore.setItemAsync('credentials', JSON.stringify(accessToken))
+		}
 		setCredentials(accessToken)
 		setLoading(false)
 	}
@@ -96,67 +106,15 @@ export default function App() {
 			setErrorState('')
 			setLoading(false)
 		}
-	}, [response]) */
+	}, [response])
 
-	const [request, response, promptAsync] = useAuthRequest(
-		{
-		  clientId: '80072',
-		  scopes: ['activity:read_all'],
-		  redirectUri: makeRedirectUri({
-			scheme: 'fastestx',
-			path: 'redirect'
-			// For usage in bare and standalone
-			// the "redirect" must match your "Authorization Callback Domain" in the Strava dev console.
-			// native: 'sportsapp://sportsapp.com',
-		  }),
-		},
-		{ authorizationEndpoint: 'https://www.strava.com/oauth/mobile/authorize' }
-	  );
-	
-	  useEffect(() => {
-		async function getCredentials() {
-			const credentials = await exchangeCodeAsync(
-				{
-				  	clientId: request?.clientId,
-					redirectUri: makeRedirectUri({
-						scheme: 'fastestx',
-						path: 'redirect'
-						// For usage in bare and standalone
-						// the "redirect" must match your "Authorization Callback Domain" in the Strava dev console.
-						// native: 'sportsapp://sportsapp.com',
-						// useProxy: true
-				  	}),
-				  	code: response?.params.code,
-				  	extraParams: {
-						// You must use the extraParams variation of clientSecret.
-						// Never store your client secret on the client.
-						client_secret: '07913394e9ea497df3bd6f9b824f666370d9c8f4',
-				  	},
-				},
-				{ tokenEndpoint: 'https://www.strava.com/oauth/token' }
-			)
-			await SecureStore.setItemAsync('credentials', JSON.stringify(credentials))
-			setCredentials(credentials)
-			setLoading(false)
-		}
-
-		if (response?.type === 'success') {
-			if(response?.params.scope === 'read,activity:read_all' || response?.params.scope === 'activity:read_all,read') {
-				setErrorState('')
-				getCredentials()
-				setLoggedIn(true)
-			} else {
-				setErrorState('wrong_scope')
-				setLoading(false)
-			}
-		} else if (response?.type === 'error') {
-			setErrorState(response?.params.error)
-			setLoading(false)
-		} else {
-			setErrorState('')
-			setLoading(false)
-		}
-	  }, [response])
+	const handleLogout = async () => {
+		setLoggedIn(false)
+		await revokeAsync({token: credentials.accessToken}, discovery)
+		await revokeAsync({token: credentials.refreshToken}, discovery)
+		await SecureStore.deleteItemAsync('credentials')
+		setLoading(false)
+	}
 
 	if (Platform.OS === 'android') {
 		UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -166,22 +124,37 @@ export default function App() {
 		<>
 			<StatusBar backgroundColor="#fc5200" />
 			<SafeAreaProvider>
-				<SafeAreaView>
+				<SafeAreaView style={{flex: 1}}>
 					<View style={[styles.topBar, {flexDirection: "row", justifyContent: "space-between"}]}>
-						<Text style={styles.title}>SportsApp</Text>
+						<Text style={styles.title}>FastestX</Text>
 						{loggedIn && !errorState && 
-							<Image
-								cachePolicy="memory-disk"
-								style={{height: 43, width: 104, marginRight: 16}}
-								contentFit="contain"
-								source={require("./assets/api_logo_pwrdBy_strava_stack_white.svg")}						
-							/>
+							<>
+								<Image
+									cachePolicy="memory-disk"
+									style={{height: 43, width: 104}}
+									contentFit="contain"
+									source={require("./assets/api_logo_pwrdBy_strava_stack_white.svg")}						
+								/>
+								<Pressable 
+									onPress={() => {
+										setLoading(true)
+										handleLogout()
+									}}
+									style={{marginRight: 16, justifyContent: 'center'}}
+								>
+									<AntDesign
+										name="logout"
+										size={24}
+										color="black"
+									/>
+								</Pressable>
+							</>
 						}
 					</View>
 					{
 						!loggedIn && loading ?
-							<View style={{justifyContent: "space-between", flex: 1}}>
-								<ActivityIndicator style={{marginTop: 16}} size='large' color="black"/>
+							<View style={{marginTop: 16, justifyContent: "space-between", flex: 1}}>
+								<ActivityIndicator size='large' color="black"/>
 								<Image
 									cachePolicy="memory-disk"
 									style={{
@@ -195,7 +168,7 @@ export default function App() {
 							</View> :
 							loggedIn ?
 								<Feed credentials={credentials}></Feed> :
-								<View style={{justifyContent: "space-between", height: "94%"}}>
+								<View style={{flex: 1, justifyContent: "space-between", alignSelf: "stretch", justifySelf: "stretch"}}>
 									<View>
 										{errorState ?
 											<Text
