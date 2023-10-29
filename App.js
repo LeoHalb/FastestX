@@ -34,6 +34,7 @@ export default function App() {
 
 	useEffect(() => {
 		const checkStoredCredentials = async () => {
+			setLoading(true)
 			const isAvailable = async () => await SecureStore.isAvailableAsync('credentials')
 			const getStoredCredentials = async () => await SecureStore.getItemAsync('credentials')
 			const storedCredentials = JSON.parse(await getStoredCredentials())
@@ -47,10 +48,12 @@ export default function App() {
 				
 					setCredentials(refreshedCredentials)
 					setLoggedIn(true)
+					setLoading(false)
 					return
 				}
 				setCredentials(storedCredentials)
 				setLoggedIn(true)
+				setLoading(false)
 			}
 		}
 
