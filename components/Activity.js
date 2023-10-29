@@ -31,13 +31,13 @@ export default function Activity(props) {
 
 	async function findFastestDistance() {
 		const trivial_winner = {
-			'start': {'distance': 0, 'time': 0},
-			'end': {'distance': 0, 'time': 0},
-			'distance': 0,
-			'time': 999999999999999,
-			'heartrate': 0,
-			'elevation': {'gain': 0, 'loss': 0},
-			'range': {'start': 0, 'end': 0}
+			start: {distance: 0, time: 0},
+			end: {distance: 0, time: 0},
+			distance: 0,
+			time: 999999999999999,
+			heartrate: 0,
+			elevation: {gain: 0, loss: 0},
+			range: {start: 0, end: 0}
 		}
 
 		if (distanceMeasure === 0 || timeMeasure === 0) {
@@ -62,12 +62,12 @@ export default function Activity(props) {
 				const distanceStreamUpperLimit = distanceStream.slice(-1) - distanceMeasure
 
 				for (let i = 0; distanceStream[i] < distanceStreamUpperLimit; i++) {
-					const j = distanceStream.indexOf(distanceStream.find(el => el - distanceStream[i] >= distanceMeasure))
+					const j = distanceStream.indexOf(distanceStream.slice(i).find(el => el - distanceStream[i] >= distanceMeasure))
 					if(j !== -1) {
 						const currentSegment = {
-							'distance': Math.round((distanceStream[j] - distanceStream[i]) * 10) / 10,
-							'time': timeStream[j] - timeStream[i],
-							'range': {start: i, end: j}
+							distance: Math.round((distanceStream[j] - distanceStream[i]) * 10) / 10,
+							time: timeStream[j] - timeStream[i],
+							range: {start: i, end: j}
 						}
 
 						if (currentSegment.time < fastestSegment.time || (currentSegment.time === fastestSegment.time && currentSegment.distance > fastestSegment.distance)) {
@@ -77,15 +77,15 @@ export default function Activity(props) {
 				}
 
 				if (fastestSegment) {
-					fastestSegment.start = {'distance': distanceStream[fastestSegment.range.start], 'time': timeStream[fastestSegment.range.start]}
-					fastestSegment.end = {'distance': distanceStream[fastestSegment.range.end], 'time': timeStream[fastestSegment.range.end]}
+					fastestSegment.start = {distance: distanceStream[fastestSegment.range.start], time: timeStream[fastestSegment.range.start]}
+					fastestSegment.end = {distance: distanceStream[fastestSegment.range.end], time: timeStream[fastestSegment.range.end]}
 					fastestSegment.pace = timeInHoursAndMinutes(Math.round((1000 / (distanceStream[fastestSegment.range.end] - distanceStream[fastestSegment.range.start])) * (timeStream[fastestSegment.range.end] - timeStream[fastestSegment.range.start])))
 					fastestSegment.heartrate = Math.round(heartrateStream?.slice(fastestSegment.range.start, fastestSegment.range.end + 1).reduce((acc, curr) => acc + curr, 0) / heartrateStream?.slice(fastestSegment.range.start, fastestSegment.range.end + 1).length)
 
 					const relevantAltitudeStream = altitudeStream?.slice(fastestSegment.range.start, fastestSegment.range.end + 1)
 					fastestSegment.elevation = {
-						'gain': Math.round(relevantAltitudeStream?.reduce((acc, curr, id, arr) => curr > arr[id - 1] ? acc + curr - arr[id - 1] : acc + 0, 0)),
-						'loss': Math.round(relevantAltitudeStream?.reduce((acc, curr, id, arr) => curr < arr[id - 1] ? acc + arr[id - 1] - curr : acc + 0, 0))
+						gain: Math.round(relevantAltitudeStream?.reduce((acc, curr, id, arr) => curr > arr[id - 1] ? acc + curr - arr[id - 1] : acc + 0, 0)),
+						loss: Math.round(relevantAltitudeStream?.reduce((acc, curr, id, arr) => curr < arr[id - 1] ? acc + arr[id - 1] - curr : acc + 0, 0))
 					}
 				}
 
@@ -96,29 +96,31 @@ export default function Activity(props) {
 				setFastestDistance(undefined)
 			}
 		} else if (!fastestDistance && timeMeasure !== '0' && timeMeasure !== '' && loading === false) {
-			if (timeMeasure >= props.activity.elapsed_time) {
-				setFastestDistance(undefined)
-				return
-			}
-
 			setLoading(true)
 			const streams = await getStreams(props.activity.id)
 			const altitudeStream = streams.altitude?.data
 			const distanceStream = streams.distance?.data
 			const timeStream = streams.time?.data
 			const heartrateStream = streams.heartrate?.data
-			const times = []
+			let fastestSegment = trivial_winner
+
+			props.activity.total_elevation_gain = Math.round(altitudeStream?.reduce((acc, curr, id, arr) => curr > arr[id - 1] ? acc + curr - arr[id - 1] : acc + 0, 0))
+
+			if (timeMeasure >= props.activity.elapsed_time) {
+				setFastestDistance(undefined)
+				return
+			}
 
 			if (distanceStream && timeStream) {
 				const timeStreamUpperLimit = timeStream.slice(-1) - timeMeasure
 
 				for (let i = 0; timeStream[i] < timeStreamUpperLimit; i++) {
-					const j = timeStream.indexOf(timeStream.find(el => el - timeStream[i] >= timeMeasure))
+					const j = timeStream.indexOf(timeStream.slice(i).find(el => el - timeStream[i] >= timeMeasure))
 					if(j !== -1) {
 						const currentSegment = {
-							'distance': Math.round((distanceStream[j] - distanceStream[i]) * 10) / 10,
-							'time': timeStream[j] - timeStream[i],
-							'range': {start: i, end: j}
+							distance: Math.round((distanceStream[j] - distanceStream[i]) * 10) / 10,
+							time: timeStream[j] - timeStream[i],
+							range: {start: i, end: j}
 						}
 
 						if (currentSegment.time < fastestSegment.time || (currentSegment.time === fastestSegment.time && currentSegment.distance > fastestSegment.distance)) {
@@ -128,25 +130,21 @@ export default function Activity(props) {
 				}
 
 				if (fastestSegment) {
-					fastestSegment.start = {'distance': distanceStream[fastestSegment.range.start], 'time': timeStream[fastestSegment.range.start]}
-					fastestSegment.end = {'distance': distanceStream[fastestSegment.range.end], 'time': timeStream[fastestSegment.range.end]}
+					fastestSegment.start = {distance: distanceStream[fastestSegment.range.start], time: timeStream[fastestSegment.range.start]}
+					fastestSegment.end = {distance: distanceStream[fastestSegment.range.end], time: timeStream[fastestSegment.range.end]}
 					fastestSegment.pace = timeInHoursAndMinutes(Math.round((1000 / (distanceStream[fastestSegment.range.end] - distanceStream[fastestSegment.range.start])) * (timeStream[fastestSegment.range.end] - timeStream[fastestSegment.range.start])))
 					fastestSegment.heartrate = Math.round(heartrateStream?.slice(fastestSegment.range.start, fastestSegment.range.end + 1).reduce((acc, curr) => acc + curr, 0) / heartrateStream?.slice(fastestSegment.range.start, fastestSegment.range.end + 1).length)
 
 					const relevantAltitudeStream = altitudeStream?.slice(fastestSegment.range.start, fastestSegment.range.end + 1)
 					fastestSegment.elevation = {
-						'gain': Math.round(relevantAltitudeStream?.reduce((acc, curr, id, arr) => curr > arr[id - 1] ? acc + curr - arr[id - 1] : acc + 0, 0)),
-						'loss': Math.round(relevantAltitudeStream?.reduce((acc, curr, id, arr) => curr < arr[id - 1] ? acc + arr[id - 1] - curr : acc + 0, 0))
+						gain: Math.round(relevantAltitudeStream?.reduce((acc, curr, id, arr) => curr > arr[id - 1] ? acc + curr - arr[id - 1] : acc + 0, 0)),
+						loss: Math.round(relevantAltitudeStream?.reduce((acc, curr, id, arr) => curr < arr[id - 1] ? acc + arr[id - 1] - curr : acc + 0, 0))
 					}
 				}
 
-				const furthestDistance = Math.max(... times.map(time => time.distance))
-				const fastestCandidates = times.filter(time => time.distance === furthestDistance);
-				const winner = fastestCandidates.find(candidate => candidate.time === Math.min(... fastestCandidates.map(candidate => candidate.time)))
-
 				setLoading(false)
 				LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-				setFastestDistance(winner)
+				setFastestDistance(fastestSegment === trivial_winner ? undefined : fastestSegment)
 			} else {
 				setFastestDistance(undefined)
 			}

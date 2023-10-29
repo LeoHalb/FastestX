@@ -19,7 +19,8 @@ const initialPosition = {
     lng: 2.5879,
 }
 
-//https://github.com/Dean177/expo-leaflet/blob/master/expo-leaflet/readme.md
+// https://github.com/Dean177/expo-leaflet/blob/master/expo-leaflet/readme.md
+// pipeline fails because of dependencies :(
 
 export const ActivityMap = () => {
 

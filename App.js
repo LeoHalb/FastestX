@@ -192,12 +192,6 @@ export default function App() {
 										</Pressable>
 										<View style={{marginTop: 16}}>
 											<Text style={{textAlign: "center"}}>Log in to see your activities</Text>
-											<Text style={{textAlign: "center"}}>{
-												makeRedirectUri({
-													scheme: 'fastestx',
-													path: 'redirect'
-												})
-											}</Text>
 										</View>
 									</View>
 									{(!loggedIn || errorState) && 
