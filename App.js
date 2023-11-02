@@ -12,7 +12,7 @@ import { Image } from 'expo-image';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import * as WebBrowser from 'expo-web-browser';
-import { makeRedirectUri, useAuthRequest, exchangeCodeAsync, TokenResponse, refreshAsync, revokeAsync } from 'expo-auth-session';
+import { makeRedirectUri, useAuthRequest, exchangeCodeAsync, TokenResponse, refreshAsync } from 'expo-auth-session';
 import Feed from "./components/Feed";
 import * as SecureStore from 'expo-secure-store';
 import { AntDesign } from '@expo/vector-icons';
@@ -66,7 +66,7 @@ export default function App() {
 			scopes: ['activity:read_all'],
 			redirectUri: makeRedirectUri({
 				scheme: 'fastestx',
-				path: 'redirect'
+				path: 'FastestX'
 			}),
 		},
 		discovery
@@ -78,7 +78,7 @@ export default function App() {
 				clientId: request?.clientId,
 				redirectUri: makeRedirectUri({
 					scheme: 'fastestx',
-					path: 'redirect'
+					path: 'FastestX'
 				}),
 				code: response?.params.code,
 			},
@@ -92,7 +92,7 @@ export default function App() {
 		setLoading(false)
 	}
 
-	useEffect(() => {
+	useEffect(() => {		
 		if (response?.type === 'success') {
 			if(response?.params.scope === 'read,activity:read_all' || response?.params.scope === 'activity:read_all,read') {
 				setErrorState('')
@@ -112,10 +112,15 @@ export default function App() {
 	}, [response])
 
 	const handleLogout = async () => {
+		if (Platform.OS !== 'web') {
+			await SecureStore.deleteItemAsync('credentials')
+		}
+		
+		await fetch(`https://www.strava.com/oauth/deauthorize?access_token=${credentials.accessToken}`, {
+			method: 'POST',
+		});
+
 		setLoggedIn(false)
-		await revokeAsync({token: credentials.accessToken}, discovery)
-		await revokeAsync({token: credentials.refreshToken}, discovery)
-		await SecureStore.deleteItemAsync('credentials')
 		setLoading(false)
 	}
 
@@ -128,31 +133,33 @@ export default function App() {
 			<StatusBar backgroundColor="#fc5200" />
 			<SafeAreaProvider>
 				<SafeAreaView style={{flex: 1}}>
-					<View style={[styles.topBar, {flexDirection: "row", justifyContent: "space-between"}]}>
-						<Text style={styles.title}>FastestX</Text>
-						{loggedIn && !errorState && 
-							<>
-								<Image
-									cachePolicy="memory-disk"
-									style={{height: 43, width: 104}}
-									contentFit="contain"
-									source={require("./assets/api_logo_pwrdBy_strava_stack_white.svg")}						
-								/>
-								<Pressable 
-									onPress={() => {
-										setLoading(true)
-										handleLogout()
-									}}
-									style={{marginRight: 16, justifyContent: 'center'}}
-								>
-									<AntDesign
-										name="logout"
-										size={24}
-										color="black"
+					<View style={[styles.topBar, {flexDirection: "row", justifyContent: "center"}]}>
+						<View style={{alignItems: "center", flexDirection: "row", width: "100%", maxWidth: 700, justifyContent: "space-between"}}>
+							<Text style={styles.title}>FastestX</Text>
+							{loggedIn && !errorState && 
+								<>
+									<Image
+										cachePolicy="memory-disk"
+										style={{height: 43, width: 104}}
+										contentFit="contain"
+										source={require("./assets/api_logo_pwrdBy_strava_stack_white.svg")}						
 									/>
-								</Pressable>
-							</>
-						}
+									<Pressable 
+										onPress={() => {
+											setLoading(true)
+											handleLogout()
+										}}
+										style={{marginRight: 16, justifyContent: 'center'}}
+									>
+										<AntDesign
+											name="logout"
+											size={24}
+											color="black"
+										/>
+									</Pressable>
+								</>
+							}
+						</View>
 					</View>
 					{
 						!loggedIn && loading ?
@@ -220,6 +227,7 @@ const styles = StyleSheet.create({
 		display: "flex"
 	},
 	topBar: {
+		height: 43,
 		backgroundColor: "#fc5200",
 	},
 	title: {

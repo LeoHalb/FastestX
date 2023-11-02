@@ -56,6 +56,7 @@ export default function Feed(props) {
             {(loading && activities.length === 0) ?
             <ActivityIndicator style={{marginTop: 16}} size='large' color="black"/>:
             <FlatList
+                style={{alignSelf: "center", width: "100%", maxWidth: 700}}
                 data={activities}
                 renderItem={renderItem}
                 keyExtractor={item => item.id}

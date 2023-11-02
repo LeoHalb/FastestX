@@ -180,14 +180,14 @@ export default function Activity(props) {
 						<View>
 							{!isNaN(props.activity.elapsed_time) && props.activity.elapsed_time !== 0 &&
 								<Ionicons
-									style={{textAlign: "center"}}
+									style={{textAlign: "center", alignSelf: "center"}}
 									name="timer" 
 									size={28}
 								/>
 							}
 							{!isNaN(props.activity.distance) && props.activity.distance !== 0 &&
 								<MaterialCommunityIcons
-									style={{textAlign: "center"}}
+									style={{textAlign: "center", alignSelf: "center"}}
 									name="map-marker-distance" 
 									size={28}
 								/>
@@ -195,12 +195,12 @@ export default function Activity(props) {
 							{!isNaN(props.activity.average_speed) && props.activity.average_speed !== 0 &&
 								<>
 									<Text
-										style={{display: "flex", textAlign: "center", fontSize: 22, fontWeight: 'bold'}}
+										style={{display: "flex", textAlign: "center", alignSelf: "center", fontSize: 22, fontWeight: 'bold'}}
 									>
 										[min/km]
 									</Text>
 									<Text
-										style={{display: "flex", textAlign: "center", fontSize: 22, fontWeight: 'bold'}}
+										style={{display: "flex", textAlign: "center", alignSelf: "center", fontSize: 22, fontWeight: 'bold'}}
 									>
 										[km/h]
 									</Text>
@@ -208,14 +208,14 @@ export default function Activity(props) {
 							}
 							{!isNaN(props.activity.average_heartrate) && props.activity.average_heartrate !== 0 &&
 								<Text
-									style={{display: "flex", textAlign: "center", fontSize: 22, fontWeight: 'bold'}}
+									style={{display: "flex", textAlign: "center", alignSelf: "center", fontSize: 22, fontWeight: 'bold'}}
 								>
 									[bpm]
 								</Text>
 							}
 							{!isNaN(props.activity.total_elevation_gain) && props.activity.total_elevation_gain !== 0 &&
 								<Text
-									style={{display: "flex", textAlign: "center", fontSize: 22, fontWeight: 'bold'}}
+									style={{display: "flex", textAlign: "center", alignSelf: "center", fontSize: 22, fontWeight: 'bold'}}
 								>
 									[m]
 								</Text>
