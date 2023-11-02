@@ -1,27 +1,27 @@
 {
   "files": {
-    "main.js": "/fastestx/static/js/main.4c36fd35.js",
-    "static/js/451.7b4d9f22.js": "/fastestx/static/js/451.7b4d9f22.js",
-    "static/media/MaterialCommunityIcons.ttf": "/fastestx/static/media/MaterialCommunityIcons.5d42b4e60858731e7b65.ttf",
-    "static/media/Ionicons.ttf": "/fastestx/static/media/Ionicons.3517aeaa34b2f8cd8eef.ttf",
-    "static/media/FontAwesome5_Solid.ttf": "/fastestx/static/media/FontAwesome5_Solid.07c3313b24f7b1ca85ee.ttf",
-    "static/media/FontAwesome5_Brands.ttf": "/fastestx/static/media/FontAwesome5_Brands.9e138496e8f1719c6ebf.ttf",
-    "static/media/AntDesign.ttf": "/fastestx/static/media/AntDesign.163adab9dbd7cb1ed12a.ttf",
-    "static/media/FontAwesome5_Regular.ttf": "/fastestx/static/media/FontAwesome5_Regular.1017bce89c72f95bcf8e.ttf",
-    "favicon.ico": "/fastestx/favicon.ico",
-    "static/media/btn_strava_connectwith_orange.svg": "/fastestx/static/media/btn_strava_connectwith_orange.d61a51baedcfa2ed1280.svg",
-    "index.html": "/fastestx/index.html",
-    "static/media/api_logo_pwrdBy_strava_stack_light.svg": "/fastestx/static/media/api_logo_pwrdBy_strava_stack_light.761875a979df9ddcff63.svg",
-    "static/media/api_logo_pwrdBy_strava_stack_white.svg": "/fastestx/static/media/api_logo_pwrdBy_strava_stack_white.a3a1cb97b4c52945cd53.svg",
-    "favicon-32.png": "/fastestx/favicon-32.png",
-    "favicon-16.png": "/fastestx/favicon-16.png",
-    "manifest.json": "/fastestx/manifest.json",
-    "serve.json": "/fastestx/serve.json",
-    "main.4c36fd35.js.map": "/fastestx/static/js/main.4c36fd35.js.map",
-    "451.7b4d9f22.js.map": "/fastestx/static/js/451.7b4d9f22.js.map"
+    "main.js": "/FastestX/static/js/main.45eb1fd9.js",
+    "static/js/451.7b4d9f22.js": "/FastestX/static/js/451.7b4d9f22.js",
+    "static/media/MaterialCommunityIcons.ttf": "/FastestX/static/media/MaterialCommunityIcons.5d42b4e60858731e7b65.ttf",
+    "static/media/Ionicons.ttf": "/FastestX/static/media/Ionicons.3517aeaa34b2f8cd8eef.ttf",
+    "static/media/FontAwesome5_Solid.ttf": "/FastestX/static/media/FontAwesome5_Solid.07c3313b24f7b1ca85ee.ttf",
+    "static/media/FontAwesome5_Brands.ttf": "/FastestX/static/media/FontAwesome5_Brands.9e138496e8f1719c6ebf.ttf",
+    "static/media/AntDesign.ttf": "/FastestX/static/media/AntDesign.163adab9dbd7cb1ed12a.ttf",
+    "static/media/FontAwesome5_Regular.ttf": "/FastestX/static/media/FontAwesome5_Regular.1017bce89c72f95bcf8e.ttf",
+    "favicon.ico": "/FastestX/favicon.ico",
+    "static/media/btn_strava_connectwith_orange.svg": "/FastestX/static/media/btn_strava_connectwith_orange.d61a51baedcfa2ed1280.svg",
+    "index.html": "/FastestX/index.html",
+    "static/media/api_logo_pwrdBy_strava_stack_light.svg": "/FastestX/static/media/api_logo_pwrdBy_strava_stack_light.761875a979df9ddcff63.svg",
+    "static/media/api_logo_pwrdBy_strava_stack_white.svg": "/FastestX/static/media/api_logo_pwrdBy_strava_stack_white.a3a1cb97b4c52945cd53.svg",
+    "favicon-32.png": "/FastestX/favicon-32.png",
+    "favicon-16.png": "/FastestX/favicon-16.png",
+    "manifest.json": "/FastestX/manifest.json",
+    "serve.json": "/FastestX/serve.json",
+    "main.45eb1fd9.js.map": "/FastestX/static/js/main.45eb1fd9.js.map",
+    "451.7b4d9f22.js.map": "/FastestX/static/js/451.7b4d9f22.js.map"
   },
   "entrypoints": [
     "static/js/451.7b4d9f22.js",
-    "static/js/main.4c36fd35.js"
+    "static/js/main.45eb1fd9.js"
   ]
 }
