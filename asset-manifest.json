@@ -1,6 +1,6 @@
 {
   "files": {
-    "main.js": "/FastestX/static/js/main.b1459e31.js",
+    "main.js": "/FastestX/static/js/main.dcf47e26.js",
     "static/js/451.cb8c7f42.js": "/FastestX/static/js/451.cb8c7f42.js",
     "static/media/MaterialCommunityIcons.ttf": "/FastestX/static/media/MaterialCommunityIcons.5d42b4e60858731e7b65.ttf",
     "static/media/Ionicons.ttf": "/FastestX/static/media/Ionicons.3517aeaa34b2f8cd8eef.ttf",
@@ -17,11 +17,11 @@
     "favicon-16.png": "/FastestX/favicon-16.png",
     "manifest.json": "/FastestX/manifest.json",
     "serve.json": "/FastestX/serve.json",
-    "main.b1459e31.js.map": "/FastestX/static/js/main.b1459e31.js.map",
+    "main.dcf47e26.js.map": "/FastestX/static/js/main.dcf47e26.js.map",
     "451.cb8c7f42.js.map": "/FastestX/static/js/451.cb8c7f42.js.map"
   },
   "entrypoints": [
     "static/js/451.cb8c7f42.js",
-    "static/js/main.b1459e31.js"
+    "static/js/main.dcf47e26.js"
   ]
 }
