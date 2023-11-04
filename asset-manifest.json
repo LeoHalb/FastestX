@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.js": "/FastestX/static/js/main.d6372967.js",
-    "static/js/451.cb8c7f42.js": "/FastestX/static/js/451.cb8c7f42.js",
+    "main.js": "/FastestX/static/js/main.03ea50e4.js",
+    "static/js/954.2bbc2c4f.js": "/FastestX/static/js/954.2bbc2c4f.js",
     "static/media/MaterialCommunityIcons.ttf": "/FastestX/static/media/MaterialCommunityIcons.5d42b4e60858731e7b65.ttf",
     "static/media/Ionicons.ttf": "/FastestX/static/media/Ionicons.3517aeaa34b2f8cd8eef.ttf",
     "static/media/FontAwesome5_Solid.ttf": "/FastestX/static/media/FontAwesome5_Solid.07c3313b24f7b1ca85ee.ttf",
@@ -17,11 +17,11 @@
     "favicon-16.png": "/FastestX/favicon-16.png",
     "manifest.json": "/FastestX/manifest.json",
     "serve.json": "/FastestX/serve.json",
-    "main.d6372967.js.map": "/FastestX/static/js/main.d6372967.js.map",
-    "451.cb8c7f42.js.map": "/FastestX/static/js/451.cb8c7f42.js.map"
+    "main.03ea50e4.js.map": "/FastestX/static/js/main.03ea50e4.js.map",
+    "954.2bbc2c4f.js.map": "/FastestX/static/js/954.2bbc2c4f.js.map"
   },
   "entrypoints": [
-    "static/js/451.cb8c7f42.js",
-    "static/js/main.d6372967.js"
+    "static/js/954.2bbc2c4f.js",
+    "static/js/main.03ea50e4.js"
   ]
 }
