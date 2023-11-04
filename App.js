@@ -29,8 +29,8 @@ export default function App() {
 
 	const [loggedIn, setLoggedIn] = useState(false)
 	const [credentials, setCredentials] = useState({})
-	const [loading, setLoading] = useState(false)
-	const [errorState, setErrorState] = useState('')
+	const [loading, setLoading] = useState(true)
+	const [errorState, setErrorState] = useState(false)
 	
 	const setAccessToken = async () => {
 		const accessToken = await exchangeCodeAsync(
@@ -114,13 +114,13 @@ export default function App() {
 		for (const [key, value] of params) {
 			paramsObj[key] = value
 		}
-		console.log(paramsObj)
 		var newURL = location.href.split("?")[0];
 		window.history.pushState('object', document.title, newURL);
 
+		console.log(paramsObj)
+
 		if (paramsObj.code !== undefined && paramsObj.scope !== undefined && paramsObj.state !== undefined) {
 			if(paramsObj.scope === 'read,activity:read_all' || paramsObj.scope === 'activity:read_all,read') {
-				console.log(1)
 				const accessToken = await exchangeCodeAsync(
 					{
 						clientId: '80072',
@@ -135,47 +135,51 @@ export default function App() {
 				
 				setCredentials(accessToken)
 				setLoading(false)
-				setErrorState('')
+				setErrorState(false)
 				setLoggedIn(true)
 			} else {
-				console.log(2)
-				setErrorState('wrong_scope')
+				setErrorState(true)
 				setLoading(false)
 			}
-		} else if (paramsObj.error) {
-			console.log(3)
-			setErrorState(paramsObj.error)
+		} else if (paramsObj.error !== undefined) {
+			setErrorState(true)
 			setLoading(false)
 		} else {
-			console.log(4)
-			setErrorState('')
+			setErrorState(false)
 			setLoading(false)
 		}
 	}, [])
 
-	useEffect(() => {		
-		if (response?.type === 'success') {
-			if(response?.params.scope === 'read,activity:read_all' || response?.params.scope === 'activity:read_all,read') {
-				console.log(1)
-				setErrorState('')
-				setAccessToken()
-				setLoggedIn(true)
+	useEffect(() => console.log(loading), [loading])
+
+	useEffect(() => {
+		if (Platform.OS !== 'web') {
+			if (response?.type === 'success') {
+				if(response?.params.scope === 'read,activity:read_all' || response?.params.scope === 'activity:read_all,read') {
+					setErrorState(false)
+					setAccessToken()
+					setLoggedIn(true)
+					setLoading(false)
+				} else {
+					setErrorState(true)
+					setLoading(false)
+				}
+			} else if (response?.type === 'error') {
+				setErrorState(true)
+				setLoading(false)
 			} else {
-				console.log(2)
-				setLoggedIn(true)
-				setErrorState('wrong_scope')
+				setErrorState(false)
 				setLoading(false)
 			}
-		} else if (response?.type === 'error') {
-			console.log(3)
-			setErrorState(response?.params.error)
-			setLoading(false)
-		} else {
-			console.log(4)
-			setErrorState('')
-			setLoading(false)
 		}
 	}, [response])
+
+	useEffect(() => console.log({
+		loggedIn: loggedIn,
+		credentials: credentials,
+		loading: loading,
+		errorState: errorState,
+	}))
 
 	if (Platform.OS === 'android') {
 		UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -215,7 +219,7 @@ export default function App() {
 						</View>
 					</View>
 					{
-						!loggedIn && loading ?
+						loading ?
 							<View style={{marginTop: 16, justifyContent: "space-between", flex: 1}}>
 								<ActivityIndicator size='large' color="black"/>
 								<Image
