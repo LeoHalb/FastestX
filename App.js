@@ -31,6 +31,51 @@ export default function App() {
 	const [credentials, setCredentials] = useState({})
 	const [loading, setLoading] = useState(false)
 	const [errorState, setErrorState] = useState('')
+	
+	const setAccessToken = async () => {
+		const accessToken = await exchangeCodeAsync(
+			{
+				clientId: request?.clientId,
+				redirectUri: makeRedirectUri({
+					scheme: 'fastestx',
+					path: 'FastestX'
+				}),
+				code: response?.params.code,
+			},
+			discovery
+		)
+		
+		if (Platform.OS !== 'web') {
+			await SecureStore.setItemAsync('credentials', JSON.stringify(accessToken))
+		}
+		setCredentials(accessToken)
+		setLoading(false)
+	}
+
+	const [request, response, promptAsync] = useAuthRequest(
+		{
+			clientId: '80072',
+			scopes: ['activity:read_all'],
+			redirectUri: makeRedirectUri({
+				scheme: 'fastestx',
+				path: 'FastestX'
+			}),
+		},
+		discovery
+	);
+
+	const handleLogout = async () => {
+		if (Platform.OS !== 'web') {
+			await SecureStore.deleteItemAsync('credentials')
+		}
+		
+		await fetch(`https://www.strava.com/oauth/deauthorize?access_token=${credentials.accessToken}`, {
+			method: 'POST',
+		});
+
+		setLoggedIn(false)
+		setLoading(false)
+	}
 
 	useEffect(() => {
 		const checkStoredCredentials = async () => {
@@ -57,72 +102,80 @@ export default function App() {
 			}
 		}
 
-		checkStoredCredentials()
+		if (Platform.OS !== "web") {
+			checkStoredCredentials()
+		}
 	}, [])
 
-	const [request, response, promptAsync] = useAuthRequest(
-		{
-			clientId: '80072',
-			scopes: ['activity:read_all'],
-			redirectUri: makeRedirectUri({
-				scheme: 'fastestx',
-				path: 'FastestX'
-			}),
-		},
-		discovery
-	);
-	
-	async function setAccessToken() {
-		const accessToken = await exchangeCodeAsync(
-			{
-				clientId: request?.clientId,
-				redirectUri: makeRedirectUri({
-					scheme: 'fastestx',
-					path: 'FastestX'
-				}),
-				code: response?.params.code,
-			},
-			discovery
-		)
-		
-		if (Platform.OS !== 'web') {
-			await SecureStore.setItemAsync('credentials', JSON.stringify(accessToken))
+	useEffect(async () => {
+		setLoading(true)
+		const params = new URLSearchParams(window.location.search)
+		const paramsObj = {}
+		for (const [key, value] of params) {
+			paramsObj[key] = value
 		}
-		setCredentials(accessToken)
-		setLoading(false)
-	}
+		console.log(paramsObj)
+		var newURL = location.href.split("?")[0];
+		window.history.pushState('object', document.title, newURL);
+
+		if (paramsObj.code !== undefined && paramsObj.scope !== undefined && paramsObj.state !== undefined) {
+			if(paramsObj.scope === 'read,activity:read_all' || paramsObj.scope === 'activity:read_all,read') {
+				console.log(1)
+				const accessToken = await exchangeCodeAsync(
+					{
+						clientId: '80072',
+						redirectUri: makeRedirectUri({
+							scheme: 'fastestx',
+							path: 'FastestX'
+						}),
+						code: paramsObj.code,
+					},
+					discovery
+				)
+				
+				setCredentials(accessToken)
+				setLoading(false)
+				setErrorState('')
+				setLoggedIn(true)
+			} else {
+				console.log(2)
+				setErrorState('wrong_scope')
+				setLoading(false)
+			}
+		} else if (paramsObj.error) {
+			console.log(3)
+			setErrorState(paramsObj.error)
+			setLoading(false)
+		} else {
+			console.log(4)
+			setErrorState('')
+			setLoading(false)
+		}
+	}, [])
 
 	useEffect(() => {		
 		if (response?.type === 'success') {
 			if(response?.params.scope === 'read,activity:read_all' || response?.params.scope === 'activity:read_all,read') {
+				console.log(1)
 				setErrorState('')
 				setAccessToken()
 				setLoggedIn(true)
 			} else {
+				console.log(2)
+				setLoggedIn(true)
 				setErrorState('wrong_scope')
 				setLoading(false)
 			}
 		} else if (response?.type === 'error') {
+			console.log(3)
 			setErrorState(response?.params.error)
 			setLoading(false)
 		} else {
+			console.log(4)
 			setErrorState('')
 			setLoading(false)
 		}
 	}, [response])
-
-	const handleLogout = async () => {
-		if (Platform.OS !== 'web') {
-			await SecureStore.deleteItemAsync('credentials')
-		}
-		
-		await fetch(`https://www.strava.com/oauth/deauthorize?access_token=${credentials.accessToken}`, {
-			method: 'POST',
-		});
-
-		setLoggedIn(false)
-		setLoading(false)
-	}
 
 	if (Platform.OS === 'android') {
 		UIManager.setLayoutAnimationEnabledExperimental(true);

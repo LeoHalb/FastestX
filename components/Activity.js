@@ -105,6 +105,7 @@ export default function Activity(props) {
 			let fastestSegment = trivial_winner
 
 			props.activity.total_elevation_gain = Math.round(altitudeStream?.reduce((acc, curr, id, arr) => curr > arr[id - 1] ? acc + curr - arr[id - 1] : acc + 0, 0))
+			props.activity.total_elevation_loss = Math.round(altitudeStream?.reduce((acc, curr, id, arr) => curr < arr[id - 1] ? acc + arr[id - 1] - curr : acc + 0, 0))
 
 			if (timeMeasure >= props.activity.elapsed_time) {
 				setFastestDistance(undefined)
@@ -279,7 +280,7 @@ export default function Activity(props) {
 										{textAlign: "center"}
 									]}
 								>
-									{`+${props.activity.total_elevation_gain}`}
+									{`+${props.activity.total_elevation_gain} / -${props.activity.total_elevation_loss}`}
 								</Text>
 							}
 						</View>
@@ -378,7 +379,7 @@ export default function Activity(props) {
 								{textAlign: "right", flex: 1, marginLeft: "auto"}
 							]}
 						>
-							{`${Math.round(props.activity.distance / 10) / 100}`}
+							{`${Math.round(props.activity.average_speed * 3.6 * 10) / 10}`}
 						</Text>
 					</View>
 					{!isNaN(fastestDistance.heartrate) &&
@@ -427,16 +428,10 @@ export default function Activity(props) {
 									{textAlign: "right", flex: 1, marginLeft: "auto"}
 								]}
 							>
-								{`+${Math.round(props.activity.total_elevation_gain)}`}
+								{`+${props.activity.total_elevation_gain} / -${props.activity.total_elevation_loss}`}
 							</Text>
 						</View>
 					}
-
-					{/* <View style={{width: "100%"}}>
-						<View style={styles.separator} />
-					</View>
-
-					<ActivityMap/> */}
 
 					<View style={{width: "100%"}}>
 						<View style={styles.separator} />
