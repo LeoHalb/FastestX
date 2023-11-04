@@ -17,6 +17,11 @@ import Feed from "./components/Feed";
 import * as SecureStore from 'expo-secure-store';
 import { AntDesign } from '@expo/vector-icons';
 
+const pwrdByStravaSmall = require("./assets/api_logo_pwrdBy_strava_stack_white.svg")
+const connectWithStrava = require("./assets/btn_strava_connectwith_orange.svg")
+const pwrdByStravaBig = require("./assets/api_logo_pwrdBy_strava_stack_light.svg")
+const demo = require('./assets/demo.jpg')
+
 WebBrowser.maybeCompleteAuthSession();
 
 const discovery = {
@@ -30,10 +35,11 @@ export default function App() {
 	const [loggedIn, setLoggedIn] = useState(false)
 	const [credentials, setCredentials] = useState({})
 	const [loading, setLoading] = useState(true)
-	const [errorState, setErrorState] = useState(false)
+	const [errorState, setErrorState] = useState('')
+	const [messyOAuthRedirectFromChromeCustomTab, setMessyOAuthRedirectFromChromeCustomTab] = useState(false)
 	
 	const setAccessToken = async () => {
-		const accessToken = await exchangeCodeAsync(
+		exchangeCodeAsync(
 			{
 				clientId: request?.clientId,
 				redirectUri: makeRedirectUri({
@@ -43,13 +49,17 @@ export default function App() {
 				code: response?.params.code,
 			},
 			discovery
-		)
-		
-		if (Platform.OS !== 'web') {
-			await SecureStore.setItemAsync('credentials', JSON.stringify(accessToken))
-		}
-		setCredentials(accessToken)
-		setLoading(false)
+		).then((data) => {
+			if (Platform.OS !== 'web') {
+				SecureStore.setItemAsync('credentials', JSON.stringify(data))
+			}
+			setCredentials(data)
+			setLoading(false)
+			setLoggedIn(true)
+		}).catch(() => {
+			setErrorState('rate_limit')
+			setLoading(false)
+		})
 	}
 
 	const [request, response, promptAsync] = useAuthRequest(
@@ -107,79 +117,92 @@ export default function App() {
 		}
 	}, [])
 
-	useEffect(async () => {
-		setLoading(true)
-		const params = new URLSearchParams(window.location.search)
-		const paramsObj = {}
-		for (const [key, value] of params) {
-			paramsObj[key] = value
-		}
-		var newURL = location.href.split("?")[0];
-		window.history.pushState('object', document.title, newURL);
+	useEffect(() => {
+		const handleMessyOAuthRedirectFromChromeCustomTab = async () => {
+			setLoading(true)
+			setMessyOAuthRedirectFromChromeCustomTab(true)
+			const params = new URLSearchParams(window.location.search)
+			const paramsObj = {}
+			for (const [key, value] of params) {
+				paramsObj[key] = value
+			}
+			var newURL = location.href.split("?")[0];
+			window.history.pushState('object', document.title, newURL);
 
-		console.log(paramsObj)
-
-		if (paramsObj.code !== undefined && paramsObj.scope !== undefined && paramsObj.state !== undefined) {
-			if(paramsObj.scope === 'read,activity:read_all' || paramsObj.scope === 'activity:read_all,read') {
-				const accessToken = await exchangeCodeAsync(
-					{
-						clientId: '80072',
-						redirectUri: makeRedirectUri({
-							scheme: 'fastestx',
-							path: 'FastestX'
-						}),
-						code: paramsObj.code,
-					},
-					discovery
-				)
-				
-				setCredentials(accessToken)
+			if (paramsObj.code !== undefined && paramsObj.scope !== undefined && paramsObj.state !== undefined) {
+				if(paramsObj.scope === 'read,activity:read_all' || paramsObj.scope === 'activity:read_all,read') {
+					exchangeCodeAsync(
+						{
+							clientId: '80072',
+							redirectUri: makeRedirectUri({
+								scheme: 'fastestx',
+								path: 'FastestX'
+							}),
+							code: paramsObj.code,
+						},
+						discovery
+					).then((data) => {
+						setCredentials(data)
+						setLoading(false)
+						setErrorState('')
+						setLoggedIn(true)
+					}).catch(() => {
+						setErrorState('rate_limit')
+						setLoading(false)
+					})
+				} else {
+					setErrorState('wrong_scope')
+					setLoading(false)
+				}
+			} else if (paramsObj.error !== undefined) {
+				setErrorState('wrong_scope')
 				setLoading(false)
-				setErrorState(false)
-				setLoggedIn(true)
 			} else {
-				setErrorState(true)
+				setErrorState('')
 				setLoading(false)
 			}
-		} else if (paramsObj.error !== undefined) {
-			setErrorState(true)
-			setLoading(false)
-		} else {
-			setErrorState(false)
-			setLoading(false)
+		}
+		
+		if (Platform.OS === 'web') {
+			handleMessyOAuthRedirectFromChromeCustomTab()
 		}
 	}, [])
 
-	useEffect(() => console.log(loading), [loading])
-
 	useEffect(() => {
-		if (Platform.OS !== 'web') {
-			if (response?.type === 'success') {
-				if(response?.params.scope === 'read,activity:read_all' || response?.params.scope === 'activity:read_all,read') {
-					setErrorState(false)
-					setAccessToken()
-					setLoggedIn(true)
-					setLoading(false)
-				} else {
-					setErrorState(true)
-					setLoading(false)
-				}
-			} else if (response?.type === 'error') {
-				setErrorState(true)
-				setLoading(false)
+		if (response?.type === 'success') {
+			if(response?.params.scope === 'read,activity:read_all' || response?.params.scope === 'activity:read_all,read') {
+				setErrorState('')
+				setAccessToken()
 			} else {
-				setErrorState(false)
+				setErrorState('wrong_scope')
 				setLoading(false)
 			}
+		} else if (response?.type === 'error') {
+			setErrorState('wrong_scope')
+			setLoading(false)
+		} else if (request !== null && !messyOAuthRedirectFromChromeCustomTab) {
+			setErrorState('')
+			setLoading(false)
 		}
 	}, [response])
 
-	useEffect(() => console.log({
-		loggedIn: loggedIn,
-		credentials: credentials,
-		loading: loading,
-		errorState: errorState,
-	}))
+	useEffect(() => {
+		const test = () => {
+			console.log(
+				{
+					Platform: Platform,
+					loggedIn: loggedIn,
+					credentials: credentials,
+					loading: loading,
+					errorState: errorState,
+					request: request,
+					response: response,
+				},
+			)
+		}
+
+		test()
+	})
 
 	if (Platform.OS === 'android') {
 		UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -199,7 +222,7 @@ export default function App() {
 										cachePolicy="memory-disk"
 										style={{height: 43, width: 104}}
 										contentFit="contain"
-										source={require("./assets/api_logo_pwrdBy_strava_stack_white.svg")}						
+										source={pwrdByStravaSmall}						
 									/>
 									<Pressable 
 										onPress={() => {
@@ -230,18 +253,24 @@ export default function App() {
 										marginTop: 16
 									}}
 									contentFit="contain"
-									source={require("./assets/api_logo_pwrdBy_strava_stack_light.svg")}						
+									source={pwrdByStravaBig}						
 								/>
 							</View> :
-							loggedIn ?
+							loggedIn && !errorState ?
 								<Feed credentials={credentials}></Feed> :
 								<View style={{flex: 1, justifyContent: "space-between", alignSelf: "stretch", justifySelf: "stretch"}}>
 									<View>
-										{errorState ?
+										{errorState === 'wrong_scope' ?
 											<Text
 												style={{width: "90%", marginLeft: "5%", marginTop: 16, color: 'red', textAlign: "center", textAlign: "center"}}
 											>
-												This app needs the permission to read all of your activities' data to work.
+												FastestX needs the permission to read all of your activities' data to work.
+											</Text> : <></>}
+										{errorState === 'rate_limit' ?
+											<Text
+												style={{width: "90%", marginLeft: "5%", marginTop: 16, color: 'red', textAlign: "center", textAlign: "center"}}
+											>
+												FastestX reached it's usage limit. It will work again tomorrow.
 											</Text> : <></>}
 										<Pressable
 											style={{marginTop: 16}}
@@ -254,12 +283,18 @@ export default function App() {
 												cachePolicy="memory-disk"
 												style={{height: 48}}
 												contentFit="contain"
-												source={require("./assets/btn_strava_connectwith_orange.svg")}
+												source={connectWithStrava}
 											/>
 										</Pressable>
 										<View style={{marginTop: 16}}>
 											<Text style={{textAlign: "center"}}>Log in to see your activities</Text>
 										</View>
+										<Image
+											cachePolicy="memory-disk"
+											style={{height: 500, marginTop: 16}}
+											contentFit="contain"
+											source={demo}						
+										/>
 									</View>
 									{(!loggedIn || errorState) && 
 										<Image
@@ -269,7 +304,7 @@ export default function App() {
 												height: 63
 											}}
 											contentFit="contain"
-											source={require("./assets/api_logo_pwrdBy_strava_stack_light.svg")}						
+											source={pwrdByStravaBig}						
 										/>}
 								</View>
 					}

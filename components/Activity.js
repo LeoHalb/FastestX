@@ -21,6 +21,7 @@ export default function Activity(props) {
 		setFastestDistance('')
 		setDistanceMeasure(props.distanceMeasure)
 		setTimeMeasure(props.timeMeasure)
+		setLoading(false)
 	}, [props.distanceMeasure, props.timeMeasure])
 
 	const [fastestDistance, setFastestDistance] = useState('')
@@ -52,6 +53,7 @@ export default function Activity(props) {
 			let fastestSegment = trivial_winner
 
 			props.activity.total_elevation_gain = Math.round(altitudeStream?.reduce((acc, curr, id, arr) => curr > arr[id - 1] ? acc + curr - arr[id - 1] : acc + 0, 0))
+			props.activity.total_elevation_loss = Math.round(altitudeStream?.reduce((acc, curr, id, arr) => curr < arr[id - 1] ? acc + arr[id - 1] - curr : acc + 0, 0))
 
 			if (distanceMeasure >= props.activity.distance) {
 				setFastestDistance(undefined)
