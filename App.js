@@ -36,7 +36,7 @@ export default function App() {
 	const [credentials, setCredentials] = useState({})
 	const [loading, setLoading] = useState(true)
 	const [errorState, setErrorState] = useState('')
-	const [messyOAuthRedirectFromChromeCustomTab, setMessyOAuthRedirectFromChromeCustomTab] = useState(false)
+	const [messyOAuthRedirectFromStravaApp, setMessyOAuthRedirectFromStravaApp] = useState(false)
 	
 	const setAccessToken = async () => {
 		exchangeCodeAsync(
@@ -118,9 +118,9 @@ export default function App() {
 	}, [])
 
 	useEffect(() => {
-		const handleMessyOAuthRedirectFromChromeCustomTab = async () => {
+		const handleMessyOAuthRedirectFromStravaApp = async () => {
 			setLoading(true)
-			setMessyOAuthRedirectFromChromeCustomTab(true)
+			setMessyOAuthRedirectFromStravaApp(true)
 			const params = new URLSearchParams(window.location.search)
 			const paramsObj = {}
 			for (const [key, value] of params) {
@@ -164,7 +164,7 @@ export default function App() {
 		}
 		
 		if (Platform.OS === 'web') {
-			handleMessyOAuthRedirectFromChromeCustomTab()
+			handleMessyOAuthRedirectFromStravaApp()
 		}
 	}, [])
 
@@ -180,7 +180,7 @@ export default function App() {
 		} else if (response?.type === 'error') {
 			setErrorState('wrong_scope')
 			setLoading(false)
-		} else if (request !== null && !messyOAuthRedirectFromChromeCustomTab) {
+		} else if (request !== null && !messyOAuthRedirectFromStravaApp) {
 			setErrorState('')
 			setLoading(false)
 		}
