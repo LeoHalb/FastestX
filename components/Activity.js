@@ -11,6 +11,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Linking from 'expo-linking';
+import {ActivityMap} from "./ActivityMap";
 // import { ActivityMap } from './ActivityMap'
 
 export default function Activity(props) {
@@ -462,6 +463,7 @@ export default function Activity(props) {
 							{`${timeInHoursAndMinutes(fastestDistance.start.time)}`}
 						</Text>
 					</View>
+					<ActivityMap></ActivityMap>
 				</View>
 			)
 		} else if (loading) {

@@ -219,7 +219,6 @@ export default function App() {
 							{loggedIn && !errorState && 
 								<>
 									<Image
-										cachePolicy="memory-disk"
 										style={{height: 43, width: 104}}
 										contentFit="contain"
 										source={pwrdByStravaSmall}						
@@ -246,7 +245,6 @@ export default function App() {
 							<View style={{marginTop: 16, justifyContent: "space-between", flex: 1}}>
 								<ActivityIndicator size='large' color="black"/>
 								<Image
-									cachePolicy="memory-disk"
 									style={{
 										width: "100%",
 										height: 63,
@@ -262,13 +260,13 @@ export default function App() {
 									<View>
 										{errorState === 'wrong_scope' ?
 											<Text
-												style={{width: "90%", marginLeft: "5%", marginTop: 16, color: 'red', textAlign: "center", textAlign: "center"}}
+												style={{width: "90%", marginLeft: "5%", marginTop: 16, color: 'red', textAlign: "center"}}
 											>
 												FastestX needs the permission to read all of your activities' data to work.
 											</Text> : <></>}
 										{errorState === 'rate_limit' ?
 											<Text
-												style={{width: "90%", marginLeft: "5%", marginTop: 16, color: 'red', textAlign: "center", textAlign: "center"}}
+												style={{width: "90%", marginLeft: "5%", marginTop: 16, color: 'red', textAlign: "center"}}
 											>
 												FastestX reached it's usage limit. It will work again tomorrow.
 											</Text> : <></>}
@@ -280,7 +278,6 @@ export default function App() {
 											}}
 										>
 											<Image
-												cachePolicy="memory-disk"
 												style={{height: 48}}
 												contentFit="contain"
 												source={connectWithStrava}
@@ -290,7 +287,6 @@ export default function App() {
 											<Text style={{textAlign: "center"}}>Log in to see your activities</Text>
 										</View>
 										<Image
-											cachePolicy="memory-disk"
 											style={{height: 500, marginTop: 16}}
 											contentFit="contain"
 											source={demo}						
@@ -298,7 +294,6 @@ export default function App() {
 									</View>
 									{(!loggedIn || errorState) && 
 										<Image
-											cachePolicy="memory-disk"
 											style={{
 												width: "100%",
 												height: 63

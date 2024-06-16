@@ -1,5 +1,5 @@
 import { ExpoLeaflet } from 'expo-leaflet'
-import { ActivityIndicator, View } from 'react-native'
+import {ActivityIndicator, Pressable} from 'react-native'
 
 const mapLayers = [{
     attribution: '&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
@@ -25,7 +25,7 @@ const initialPosition = {
 export const ActivityMap = () => {
 
     return (
-        <View style={{width: "100%", height: 260}}>
+        <Pressable style={{width: "100%", height: 260}}>
             <ExpoLeaflet
                 loadingIndicator={() => <ActivityIndicator />}
                 onMessage={() => {}}
@@ -34,7 +34,7 @@ export const ActivityMap = () => {
                 mapOptions={mapOptions}
                 zoom={7}
             />
-        </View>
+        </Pressable>
     )
 
 }
