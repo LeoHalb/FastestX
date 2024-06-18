@@ -50,9 +50,6 @@ export default function App() {
             },
             discovery
         ).then((data) => {
-            if (Platform.OS !== 'web') {
-                SecureStore.setItemAsync('credentials', JSON.stringify(data))
-            }
             setCredentials(data)
             setLoading(false)
             setLoggedIn(true)

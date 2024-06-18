@@ -9,11 +9,11 @@ import {
     TextInput,
     LayoutAnimation
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons'; 
+import { Ionicons } from '@expo/vector-icons';
 import Activity from "./Activity.js";
 
 export default function Feed(props) {
-    
+
     const [activities, setActivities] = useState([]);
     const [refreshing, setRefreshing] = useState(false)
     const [loading, setLoading] = useState(true)
@@ -28,7 +28,7 @@ export default function Feed(props) {
     }, [props.credentials])
 
     async function getActivities(refresh) {
-        refresh ? 
+        refresh ?
             setRefreshing(true) :
             setLoading(true)
         fetch(`https://www.strava.com/api/v3/athlete/activities?access_token=${props.credentials.accessToken}&per_page=10&page=${refresh ? 1 : page}`)
@@ -54,74 +54,74 @@ export default function Feed(props) {
     return (
         <>
             {(loading && activities.length === 0) ?
-            <ActivityIndicator style={{marginTop: 16}} size='large' color="black"/>:
-            <FlatList
-                style={{alignSelf: "center", width: "100%", maxWidth: 700}}
-                data={activities}
-                renderItem={renderItem}
-                keyExtractor={item => item.id}
-                keyboardDismissMode={'onDrag'}
-                onRefresh={() => {
-                    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-                    getActivities(true)
-                }}
-                refreshing={refreshing}
-                ListHeaderComponent={
-                    <View style={styles.item}>
-                        <View style={{flexDirection: "row", justifyContent: "space-between"}}>
-                            <Text style={{fontSize: 24}}>Distance [m]</Text>
-                            <TextInput
-                                style={styles.input}
-                                contextMenuHidden={true}
-                                selectionColor='#fc5200'
-                                inputMode={"numeric"}
-                                onChangeText={text => {
-                                    var number = text.replace(/[^0-9]/g, '')
-                                    isNaN(number) ?
-                                        setDistanceMeasure(0) :
-                                        setTimeMeasure('')
+                <ActivityIndicator style={{marginTop: 16}} size='large' color="black"/>:
+                <FlatList
+                    style={{alignSelf: "center", width: "100%", maxWidth: 700}}
+                    data={activities}
+                    renderItem={renderItem}
+                    keyExtractor={item => item.id}
+                    keyboardDismissMode={'onDrag'}
+                    onRefresh={() => {
+                        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+                        getActivities(true)
+                    }}
+                    refreshing={refreshing}
+                    ListHeaderComponent={
+                        <View style={styles.item}>
+                            <View style={{flexDirection: "row", justifyContent: "space-between"}}>
+                                <Text style={{fontSize: 24}}>Distance [m]</Text>
+                                <TextInput
+                                    style={styles.input}
+                                    contextMenuHidden={true}
+                                    selectionColor='#fc5200'
+                                    inputMode={"numeric"}
+                                    onChangeText={text => {
+                                        var number = text.replace(/[^0-9]/g, '')
+                                        isNaN(number) ?
+                                            setDistanceMeasure(0) :
+                                            setTimeMeasure('')
                                         setDistanceMeasure(number)
-                                }}
-                                value={distanceMeasure.toString()}
-                            />
-                        </View>
-                        <View style={{flexDirection: "row", justifyContent: "space-between", marginTop: 5}}>
-                        <Text style={{fontSize: 24}}>Time [s]</Text>
-                        <TextInput
-                            style={styles.input}
-                            contextMenuHidden={true}
-                            selectionColor='#fc5200'
-                            inputMode={"numeric"}
-                            onChangeText={text => {
-                                var number = text.replace(/[^0-9]/g, '')
-                                isNaN(number) ?
-                                    setTimeMeasure('') :
-                                    setDistanceMeasure('')
-                                    setTimeMeasure(number)
-                            }}
-                            value={timeMeasure.toString()}
-                        />
-                        </View>
-                    </View>
-                }
-                ListFooterComponent={
-                    <Pressable 
-                        style={[styles.item, {marginBottom: 16, alignItems: "center"}]}
-                        onPress={() => {
-                            LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-                            getActivities(false)
-                        }}
-                    >
-                        {loading ? 
-                            <ActivityIndicator style={{marginTop: 19, marginBottom: 19}} color="black"/> :
-                            <View  style={{flexDirection: "row", marginTop: 13, marginBottom: 13}}>
-                                <Ionicons name="reload-circle" size={28} color="black" />
-                                <Text style={{fontSize: 24}}> Load more</Text>
+                                    }}
+                                    value={distanceMeasure.toString()}
+                                />
                             </View>
-                        }
-                    </Pressable>
-                }
-            />
+                            <View style={{flexDirection: "row", justifyContent: "space-between", marginTop: 5}}>
+                                <Text style={{fontSize: 24}}>Time [s]</Text>
+                                <TextInput
+                                    style={styles.input}
+                                    contextMenuHidden={true}
+                                    selectionColor='#fc5200'
+                                    inputMode={"numeric"}
+                                    onChangeText={text => {
+                                        var number = text.replace(/[^0-9]/g, '')
+                                        isNaN(number) ?
+                                            setTimeMeasure('') :
+                                            setDistanceMeasure('')
+                                        setTimeMeasure(number)
+                                    }}
+                                    value={timeMeasure.toString()}
+                                />
+                            </View>
+                        </View>
+                    }
+                    ListFooterComponent={
+                        <Pressable
+                            style={[styles.item, {marginBottom: 16, alignItems: "center"}]}
+                            onPress={() => {
+                                LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+                                getActivities(false)
+                            }}
+                        >
+                            {loading ?
+                                <ActivityIndicator style={{marginTop: 19, marginBottom: 19}} color="black"/> :
+                                <View  style={{flexDirection: "row", marginTop: 13, marginBottom: 13}}>
+                                    <Ionicons name="reload-circle" size={28} color="black" />
+                                    <Text style={{fontSize: 24}}> Load more</Text>
+                                </View>
+                            }
+                        </Pressable>
+                    }
+                />
             }
         </>
     )
@@ -129,26 +129,26 @@ export default function Feed(props) {
 
 const styles = StyleSheet.create({
     item: {
-      marginHorizontal: 16,
-      marginTop: 16,
-      backgroundColor: "#fc5200",
-      borderRadius: 20,
-      padding: 16,
-      elevation: 2,
-      boxShadowColor: "#000",
-      boxShadowOffset: {
-        width: 0,
-        height: 2
-      },
-      boxShadowOpacity: 0.25,
-      boxShadowRadius: 4,
+        marginHorizontal: 16,
+        marginTop: 16,
+        backgroundColor: "#fc5200",
+        borderRadius: 20,
+        padding: 16,
+        elevation: 2,
+        boxShadowColor: "#000",
+        boxShadowOffset: {
+            width: 0,
+            height: 2
+        },
+        boxShadowOpacity: 0.25,
+        boxShadowRadius: 4,
     },
     input: {
-      backgroundColor: "white",
-      width: 100,
-      fontSize: 24,
-      textAlign: "center",
-      borderRadius: 10
+        backgroundColor: "white",
+        width: 100,
+        fontSize: 24,
+        textAlign: "center",
+        borderRadius: 10
     },
-  });
+});
   

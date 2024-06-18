@@ -33,14 +33,6 @@ export default function Activity(props) {
     const [timeMeasure, setTimeMeasure] = useState('')
     const [positions, setPositions] = useState({latlng: [], fastestLatlng: []})
 
-    useEffect(() => {
-        if (positions.latlng.length > 0 && positions.fastestLatlng.length === 0) {
-            setPositions({
-                ...positions,
-                fastestLatlng: positions.latlng.slice(fastestDistance.range.start, fastestDistance.range.end + 1)
-            })
-        }
-    }, [positions])
 
     async function findFastestDistance() {
         const trivial_winner = {
@@ -64,10 +56,6 @@ export default function Activity(props) {
             const heartrateStream = streams.heartrate?.data
             const latlngStream = streams.latlng?.data
 
-            if (latlngStream) {
-                setPositions({...positions, latlng: latlngStream})
-            }
-
             let fastestSegment = trivial_winner
 
             props.activity.total_elevation_gain = Math.round(altitudeStream?.reduce((acc, curr, id, arr) => curr > arr[id - 1] ? acc + curr - arr[id - 1] : acc + 0, 0))
@@ -75,6 +63,7 @@ export default function Activity(props) {
 
             if (distanceMeasure >= props.activity.distance) {
                 setFastestDistance(undefined)
+                setPositions({latlng: latlngStream, fastestLatlng: []})
                 return
             }
 
@@ -115,9 +104,12 @@ export default function Activity(props) {
                     }
                 }
 
-                if (positions.latlng.length > 0) {
-                    const fastestLatLng = latlngStream.slice(fastestSegment.range.start, fastestSegment.range.end + 1)
-                    setPositions({...positions, fastestLatLng: fastestLatLng})
+                if (latlngStream?.length > 0) {
+                    let fastestLatlng = []
+                    if (fastestSegment) {
+                        fastestLatlng = latlngStream.slice(fastestSegment.range.start, fastestSegment.range.end + 1)
+                    }
+                    setPositions({latlng: latlngStream, fastestLatlng: fastestLatlng})
                 }
 
                 setLoading(false)
@@ -146,6 +138,7 @@ export default function Activity(props) {
 
             if (timeMeasure >= props.activity.elapsed_time) {
                 setFastestDistance(undefined)
+                setPositions({latlng: latlngStream, fastestLatlng: []})
                 return
             }
 
@@ -186,9 +179,12 @@ export default function Activity(props) {
                     }
                 }
 
-                if (positions.latlng.length > 0) {
-                    const fastestLatLng = latlngStream.slice(fastestSegment.range.start, fastestSegment.range.end + 1)
-                    setPositions({...positions, fastestLatLng: fastestLatLng})
+                if (latlngStream?.length > 0) {
+                    let fastestLatlng = []
+                    if (fastestSegment) {
+                        fastestLatlng = latlngStream.slice(fastestSegment.range.start, fastestSegment.range.end + 1)
+                    }
+                    setPositions({latlng: latlngStream, fastestLatlng: fastestLatlng})
                 }
 
                 setLoading(false)
@@ -218,8 +214,6 @@ export default function Activity(props) {
         return fetch(`https://www.strava.com/api/v3/activities/${id}/streams?access_token=${props.credentials.accessToken}&keys=time,distance,heartrate,altitude,latlng&key_by_type=true`)
             .then((res) => res.json())
     }
-
-    console.log(positions)
 
     function DrawDistance() {
         if (fastestDistance === undefined || distanceMeasure === '0' || timeMeasure === '0') {
@@ -359,6 +353,15 @@ export default function Activity(props) {
                             }
                         </View>
                     </View>
+
+                    {positions.latlng?.length > 0 ?
+                        <>
+                            <View style={{width: "100%"}}>
+                                <View style={styles.separator}/>
+                            </View>
+                            <ActivityMap positions={positions}></ActivityMap>
+                        </> : <></>
+                    }
                 </View>
             )
         } else if (fastestDistance) {
@@ -511,9 +514,9 @@ export default function Activity(props) {
                         <View style={styles.separator}/>
                     </View>
 
-                    {positions.latlng.length > 0 ? <ActivityMap positions={positions}></ActivityMap> : <></>}
+                    {positions.latlng?.length > 0 ? <ActivityMap positions={positions}></ActivityMap> : <></>}
 
-                    <View style={[styles.modalLine, {display: "flex", marginTop: 8}]}>
+                    <View style={[styles.modalLine, {display: "flex", marginTop: positions.latlng?.length > 0 ? 8 : 0}]}>
                         <Text
                             style={[
                                 styles.name,
@@ -550,7 +553,7 @@ export default function Activity(props) {
     return (
         <Pressable
             style={styles.item}
-            onPressIn={() => {
+            onPress={() => {
                 findFastestDistance(props.activity)
                 updateLayout()
             }}>
