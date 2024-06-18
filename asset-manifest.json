@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/FastestX/static/css/main.98306781.css",
-    "main.js": "/FastestX/static/js/main.17ba37ee.js",
-    "static/js/25.765b6fcf.js": "/FastestX/static/js/25.765b6fcf.js",
+    "main.js": "/FastestX/static/js/main.41f39941.js",
+    "static/js/269.1c19320a.js": "/FastestX/static/js/269.1c19320a.js",
     "static/media/MaterialCommunityIcons.ttf": "/FastestX/static/media/MaterialCommunityIcons.5d42b4e60858731e7b65.ttf",
     "static/media/demo.jpg": "/FastestX/static/media/demo.a225dedf09db6a0446c9.jpg",
     "static/media/Ionicons.ttf": "/FastestX/static/media/Ionicons.3517aeaa34b2f8cd8eef.ttf",
@@ -22,12 +22,12 @@
     "manifest.json": "/FastestX/manifest.json",
     "serve.json": "/FastestX/serve.json",
     "main.98306781.css.map": "/FastestX/static/css/main.98306781.css.map",
-    "main.17ba37ee.js.map": "/FastestX/static/js/main.17ba37ee.js.map",
-    "25.765b6fcf.js.map": "/FastestX/static/js/25.765b6fcf.js.map"
+    "main.41f39941.js.map": "/FastestX/static/js/main.41f39941.js.map",
+    "269.1c19320a.js.map": "/FastestX/static/js/269.1c19320a.js.map"
   },
   "entrypoints": [
-    "static/js/25.765b6fcf.js",
+    "static/js/269.1c19320a.js",
     "static/css/main.98306781.css",
-    "static/js/main.17ba37ee.js"
+    "static/js/main.41f39941.js"
   ]
 }
