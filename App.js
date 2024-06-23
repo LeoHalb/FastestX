@@ -97,7 +97,7 @@ export default function App() {
                     )
 
                     setCredentials(refreshedCredentials)
-                    await AsyncStorage.setItem(refreshedCredentials)
+                    await AsyncStorage.setItem("strava_credentials", JSON.stringify(refreshedCredentials))
                     setLoggedIn(true)
                     setLoading(false)
                     return
