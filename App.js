@@ -14,8 +14,8 @@ import {StatusBar} from 'expo-status-bar';
 import * as WebBrowser from 'expo-web-browser';
 import {makeRedirectUri, useAuthRequest, exchangeCodeAsync, TokenResponse, refreshAsync} from 'expo-auth-session';
 import Feed from "./components/Feed";
-import * as SecureStore from 'expo-secure-store';
 import {AntDesign} from '@expo/vector-icons';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const pwrdByStravaSmall = require("./assets/api_logo_pwrdBy_strava_stack_white.svg")
 const connectWithStrava = require("./assets/btn_strava_connectwith_orange.svg")
@@ -51,6 +51,7 @@ export default function App() {
             discovery
         ).then((data) => {
             setCredentials(data)
+            AsyncStorage.setItem("strava_credentials", JSON.stringify(data))
             setLoading(false)
             setLoggedIn(true)
         }).catch(() => {
@@ -72,14 +73,12 @@ export default function App() {
     );
 
     const handleLogout = async () => {
-        if (Platform.OS !== 'web') {
-            await SecureStore.deleteItemAsync('credentials')
-        }
-
         await fetch(`https://www.strava.com/oauth/deauthorize?access_token=${credentials.accessToken}`, {
             method: 'POST',
         });
 
+        await AsyncStorage.removeItem("strava_credentials");
+        setCredentials({})
         setLoggedIn(false)
         setLoading(false)
     }
@@ -87,11 +86,10 @@ export default function App() {
     useEffect(() => {
         const checkStoredCredentials = async () => {
             setLoading(true)
-            const isAvailable = async () => await SecureStore.isAvailableAsync('credentials')
-            const getStoredCredentials = async () => await SecureStore.getItemAsync('credentials')
+            const getStoredCredentials = async () => await AsyncStorage.getItem("strava_credentials")
             const storedCredentials = JSON.parse(await getStoredCredentials())
 
-            if (await isAvailable() && storedCredentials !== null) {
+            if (await storedCredentials !== null) {
                 if (!TokenResponse.isTokenFresh(storedCredentials)) {
                     const refreshedCredentials = await refreshAsync(
                         {clientId: '80072', refreshToken: storedCredentials.refreshToken},
@@ -99,6 +97,7 @@ export default function App() {
                     )
 
                     setCredentials(refreshedCredentials)
+                    await AsyncStorage.setItem(refreshedCredentials)
                     setLoggedIn(true)
                     setLoading(false)
                     return
@@ -109,9 +108,7 @@ export default function App() {
             }
         }
 
-        if (Platform.OS !== "web") {
-            checkStoredCredentials()
-        }
+        checkStoredCredentials()
     }, [])
 
     useEffect(() => {
@@ -140,6 +137,7 @@ export default function App() {
                         discovery
                     ).then((data) => {
                         setCredentials(data)
+                        AsyncStorage.setItem("strava_credentials", JSON.stringify(data))
                         setLoading(false)
                         setErrorState('')
                         setLoggedIn(true)

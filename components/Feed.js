@@ -9,7 +9,7 @@ import {
     TextInput,
     LayoutAnimation
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import {Ionicons} from '@expo/vector-icons';
 import Activity from "./Activity.js";
 
 export default function Feed(props) {
@@ -45,7 +45,7 @@ export default function Feed(props) {
             })
     }
 
-    function renderItem({ item }) {
+    const renderItem = ({item}) => {
         return (
             <Activity activity={item} distanceMeasure={distanceMeasure} timeMeasure={timeMeasure} credentials={props.credentials}/>
         )
@@ -113,9 +113,9 @@ export default function Feed(props) {
                             }}
                         >
                             {loading ?
-                                <ActivityIndicator style={{marginTop: 19, marginBottom: 19}} color="black"/> :
-                                <View  style={{flexDirection: "row", marginTop: 13, marginBottom: 13}}>
-                                    <Ionicons name="reload-circle" size={28} color="black" />
+                                <ActivityIndicator style={{marginTop: 14, marginBottom: 14}} color="black"/> :
+                                <View style={{flexDirection: "row", marginTop: 8, marginBottom: 8}}>
+                                    <Ionicons name="reload-circle" size={28} color="black"/>
                                     <Text style={{fontSize: 24}}> Load more</Text>
                                 </View>
                             }
