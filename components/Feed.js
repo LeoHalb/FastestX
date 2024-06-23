@@ -77,10 +77,13 @@ export default function Feed(props) {
                                     inputMode={"numeric"}
                                     onChangeText={text => {
                                         var number = text.replace(/[^0-9]/g, '')
-                                        isNaN(number) ?
-                                            setDistanceMeasure(0) :
+                                        if (isNaN(parseInt(number))) {
                                             setTimeMeasure('')
-                                        setDistanceMeasure(number)
+                                            setDistanceMeasure('0')
+                                        } else {
+                                            setTimeMeasure('')
+                                            setDistanceMeasure(parseInt(number).toString())
+                                        }
                                     }}
                                     value={distanceMeasure.toString()}
                                 />
@@ -94,10 +97,13 @@ export default function Feed(props) {
                                     inputMode={"numeric"}
                                     onChangeText={text => {
                                         var number = text.replace(/[^0-9]/g, '')
-                                        isNaN(number) ?
-                                            setTimeMeasure('') :
+                                        if (isNaN(parseInt(number))) {
                                             setDistanceMeasure('')
-                                        setTimeMeasure(number)
+                                            setTimeMeasure('0')
+                                        } else {
+                                            setDistanceMeasure('')
+                                            setTimeMeasure(parseInt(number).toString())
+                                        }
                                     }}
                                     value={timeMeasure.toString()}
                                 />

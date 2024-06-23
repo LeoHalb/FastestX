@@ -12,27 +12,25 @@ import {FontAwesome5} from '@expo/vector-icons';
 import {MaterialCommunityIcons} from '@expo/vector-icons';
 import * as Linking from 'expo-linking';
 import {ActivityMap} from "./ActivityMap";
-// import { ActivityMap } from './ActivityMap'
 
 export default function Activity(props) {
 
     useEffect(() => {
         LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
         setExpanded(false)
-        setFastestDistance('')
+        setFastestDistance(undefined)
         setDistanceMeasure(props.distanceMeasure)
         setTimeMeasure(props.timeMeasure)
         setLoading(false)
         setPositions({latlng: [], fastestLatlng: []})
     }, [props.distanceMeasure, props.timeMeasure])
 
-    const [fastestDistance, setFastestDistance] = useState('')
+    const [fastestDistance, setFastestDistance] = useState(undefined)
     const [loading, setLoading] = useState(false)
     const [expanded, setExpanded] = useState(false)
     const [distanceMeasure, setDistanceMeasure] = useState('1000')
     const [timeMeasure, setTimeMeasure] = useState('')
     const [positions, setPositions] = useState({latlng: [], fastestLatlng: []})
-
 
     async function findFastestDistance() {
         const trivial_winner = {
@@ -45,8 +43,19 @@ export default function Activity(props) {
             range: {start: 0, end: 0}
         }
 
-        if (distanceMeasure === 0 || timeMeasure === 0) {
+        if (distanceMeasure === '0' || timeMeasure === '0' || (distanceMeasure === '' && timeMeasure === '')) {
+            setLoading(true)
+            const streams = await getStreams(props.activity.id)
+            const altitudeStream = streams.altitude?.data
+            const latlngStream = streams.latlng?.data
+
+            if (latlngStream?.length > 0) {
+                setPositions({latlng: latlngStream, fastestLatlng: []})
+            }
+            props.activity.total_elevation_loss = Math.round(altitudeStream?.reduce((acc, curr, id, arr) => curr < arr[id - 1] ? acc + arr[id - 1] - curr : acc + 0, 0))
+
             setFastestDistance(trivial_winner)
+            setLoading(false)
         } else if (!fastestDistance && distanceMeasure !== '0' && distanceMeasure !== '' && loading === false) {
             setLoading(true)
             const streams = await getStreams(props.activity.id)
@@ -64,6 +73,7 @@ export default function Activity(props) {
             if (distanceMeasure >= props.activity.distance) {
                 setFastestDistance(undefined)
                 setPositions({latlng: latlngStream, fastestLatlng: []})
+                setLoading(false)
                 return
             }
 
@@ -139,6 +149,7 @@ export default function Activity(props) {
             if (timeMeasure >= props.activity.elapsed_time) {
                 setFastestDistance(undefined)
                 setPositions({latlng: latlngStream, fastestLatlng: []})
+                setLoading(false)
                 return
             }
 
@@ -216,7 +227,7 @@ export default function Activity(props) {
     }
 
     function DrawDistance() {
-        if (fastestDistance === undefined || distanceMeasure === '0' || timeMeasure === '0') {
+        if (fastestDistance === undefined || distanceMeasure === '0' || timeMeasure === '0' || (distanceMeasure === '' && timeMeasure === '') && !loading) {
             return (
                 <View style={styles.modalContainer}>
                     <View
@@ -572,10 +583,10 @@ export default function Activity(props) {
                     View on Strava
                 </Text>
             </Pressable>
-            {expanded && distanceMeasure !== '0' && timeMeasure !== '0' ?
+            {expanded ?
                 <View style={{width: "100%"}}>
                     <View style={styles.separator}/>
-                    <DrawDistance></DrawDistance>
+                    {loading ? <ActivityIndicator color="black"/> : <DrawDistance></DrawDistance>}
                 </View> :
                 null
             }

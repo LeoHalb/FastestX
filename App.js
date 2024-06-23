@@ -105,14 +105,17 @@ export default function App() {
                 setCredentials(storedCredentials)
                 setLoggedIn(true)
                 setLoading(false)
+                return
             }
+            setLoggedIn(false)
+            setLoading(false)
         }
 
         checkStoredCredentials()
     }, [])
 
     useEffect(() => {
-        const handleMessyOAuthRedirectFromStravaApp = async () => {
+        const handleChromeMobileOpeningNewTab = async () => {
             setLoading(true)
             setMessyOAuthRedirectFromStravaApp(true)
             const params = new URLSearchParams(window.location.search)
@@ -144,23 +147,25 @@ export default function App() {
                     }).catch(() => {
                         setErrorState('rate_limit')
                         setLoading(false)
+                        setLoggedIn(false)
                     })
                 } else {
                     setErrorState('wrong_scope')
                     setLoading(false)
+                    setLoggedIn(false)
                 }
             } else if (paramsObj.error !== undefined) {
                 setErrorState('wrong_scope')
                 setLoading(false)
+                setLoggedIn(false)
             } else {
                 setErrorState('')
                 setLoading(false)
+                setLoggedIn(false)
             }
         }
 
-        if (Platform.OS === 'web') {
-            handleMessyOAuthRedirectFromStravaApp()
-        }
+        handleChromeMobileOpeningNewTab()
     }, [])
 
     useEffect(() => {
