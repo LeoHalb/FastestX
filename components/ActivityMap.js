@@ -1,17 +1,29 @@
 import {ExpoLeaflet} from 'expo-leaflet'
-import {polygonCenter} from "leaflet/src/geometry/PolyUtil";
+import {centroid} from "leaflet/src/geometry/PolyUtil";
 import {EPSG3857} from "leaflet/src/geo/crs/CRS.EPSG3857";
 import {ActivityIndicator, Pressable} from 'react-native'
 import "leaflet/dist/leaflet.css"
+import {Polyline} from "leaflet/src/layer";
+import {Map} from "leaflet/src/map";
+
+//wtf https://stackoverflow.com/questions/34215394/leaflet-finding-the-zoom-level-of-bounds-without-using-a-map-instance
+Map.include({
+    getSize: function () {
+        return new L.Point(260, 260);
+    }
+})
 
 export const ActivityMap = (props) => {
 
-    const center = polygonCenter(props.positions.fastestLatlng.length > 0 ? props.positions.fastestLatlng : props.positions.latlng, EPSG3857)
+    //const [bounds, setBounds] = useState([[new Polyline(props.positions.latlng).getBounds()._southWest.lat, new Polyline(props.positions.latlng).getBounds()._southWest.lng], [new Polyline(props.positions.latlng).getBounds()._northEast.lat, new Polyline(props.positions.latlng).getBounds()._northEast.lng]])
+    const zoom = new Map(document.createElement("div"), {'center': [0, 0], 'zoom': 0}).fitBounds(new Polyline(props.positions.latlng).getBounds()).getZoom()
+    const center = centroid(props.positions.latlng, EPSG3857)
 
     const mapLayers = [{
         attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
         baseLayerIsChecked: true,
         baseLayerName: 'OpenStreetMap',
+        //bounds: bounds,
         layerType: 'TileLayer',
         url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     }]
@@ -36,6 +48,9 @@ export const ActivityMap = (props) => {
 
     const mapOptions = {
         zoomControl: false,
+        minZoom: 1,
+        //maxBounds: bounds,
+        //maxBoundsViscosity: 1
     }
 
     const initialPosition = {
@@ -44,18 +59,16 @@ export const ActivityMap = (props) => {
     }
 
     return (
-        <>
-            <Pressable style={{width: "100%", height: "260px"}}>
-                <ExpoLeaflet
-                    loadingIndicator={() => <ActivityIndicator/>}
-                    onMessage={() => {}}
-                    mapCenterPosition={initialPosition}
-                    mapLayers={mapLayers}
-                    mapOptions={mapOptions}
-                    mapShapes={mapShapes}
-                />
-            </Pressable>
-        </>
+        <Pressable style={{width: "100%", height: "260px"}}>
+            <ExpoLeaflet
+                loadingIndicator={() => <ActivityIndicator/>}
+                onMessage={() => {}}
+                mapCenterPosition={initialPosition}
+                mapLayers={mapLayers}
+                mapOptions={mapOptions}
+                mapShapes={mapShapes}
+                zoom={zoom <= 18 ? zoom : 18}
+            />
+        </Pressable>
     )
-
 }
