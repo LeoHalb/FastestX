@@ -4,6 +4,7 @@ import {
     Text,
     View,
     Platform,
+    UIManager,
     Pressable,
     ActivityIndicator,
 } from 'react-native';
@@ -49,15 +50,13 @@ export default function App() {
             },
             discovery
         ).then((data) => {
-            if (data.accessToken === undefined) {
-                setLoading(false)
-                return
-            }
             setCredentials(data)
             AsyncStorage.setItem("strava_credentials", JSON.stringify(data))
+            setLoading(false)
             setLoggedIn(true)
         }).catch(() => {
             setErrorState('rate_limit')
+            setLoading(false)
         })
     }
 
@@ -83,6 +82,37 @@ export default function App() {
         setLoggedIn(false)
         setLoading(false)
     }
+
+    useEffect(() => {
+        const checkStoredCredentials = async () => {
+            setLoading(true)
+            const getStoredCredentials = async () => await AsyncStorage.getItem("strava_credentials")
+            const storedCredentials = JSON.parse(await getStoredCredentials())
+
+            if (await storedCredentials !== null) {
+                if (!TokenResponse.isTokenFresh(storedCredentials)) {
+                    const refreshedCredentials = await refreshAsync(
+                        {clientId: '80072', refreshToken: storedCredentials.refreshToken},
+                        discovery
+                    )
+
+                    setCredentials(refreshedCredentials)
+                    await AsyncStorage.setItem("strava_credentials", JSON.stringify(refreshedCredentials))
+                    setLoggedIn(true)
+                    setLoading(false)
+                    return
+                }
+                setCredentials(storedCredentials)
+                setLoggedIn(true)
+                setLoading(false)
+                return
+            }
+            setLoggedIn(false)
+            setLoading(false)
+        }
+
+        checkStoredCredentials()
+    }, [])
 
     useEffect(() => {
         const handleChromeMobileOpeningNewTab = async () => {
@@ -111,57 +141,38 @@ export default function App() {
                     ).then((data) => {
                         setCredentials(data)
                         AsyncStorage.setItem("strava_credentials", JSON.stringify(data))
+                        setLoading(false)
                         setErrorState('')
                         setLoggedIn(true)
                     }).catch(() => {
                         setErrorState('rate_limit')
+                        setLoading(false)
                         setLoggedIn(false)
                     })
                 } else {
                     setErrorState('wrong_scope')
+                    setLoading(false)
                     setLoggedIn(false)
                 }
             } else if (paramsObj.error !== undefined) {
                 setErrorState('wrong_scope')
+                setLoading(false)
                 setLoggedIn(false)
             } else {
                 setErrorState('')
+                setLoading(false)
+                setLoggedIn(false)
             }
-        }
-
-        const checkStoredCredentials = async () => {
-            const getStoredCredentials = async () => await AsyncStorage.getItem("strava_credentials")
-            const storedCredentials = JSON.parse(await getStoredCredentials())
-
-            if (await storedCredentials !== null) {
-                if (!TokenResponse.isTokenFresh(storedCredentials)) {
-                    const refreshedCredentials = await refreshAsync(
-                        {clientId: '80072', refreshToken: storedCredentials.refreshToken},
-                        discovery
-                    )
-
-                    setCredentials(refreshedCredentials)
-                    await AsyncStorage.setItem("strava_credentials", JSON.stringify(refreshedCredentials))
-                    setLoggedIn(true)
-                    return
-                }
-                setCredentials(storedCredentials)
-                setLoggedIn(true)
-                return
-            }
-            setLoggedIn(false)
         }
 
         handleChromeMobileOpeningNewTab()
-            .then(() => checkStoredCredentials())
-            .then(() => setLoading(false))
     }, [])
 
     useEffect(() => {
         if (response?.type === 'success') {
             if (response?.params.scope === 'read,activity:read_all' || response?.params.scope === 'activity:read_all,read') {
                 setErrorState('')
-                setAccessToken().then(() => setLoading(false))
+                setAccessToken()
             } else {
                 setErrorState('wrong_scope')
                 setLoading(false)
@@ -192,6 +203,10 @@ export default function App() {
 
         test()
     })
+
+    if (Platform.OS === 'android') {
+        UIManager.setLayoutAnimationEnabledExperimental(true);
+    }
 
     return (
         <>

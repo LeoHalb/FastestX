@@ -15,7 +15,7 @@ Map.include({
 
 export const ActivityMap = (props) => {
 
-    const bounds = [[new Polyline(props.positions.latlng).getBounds().pad(0.2)._southWest.lat, new Polyline(props.positions.latlng).getBounds().pad(0.2)._southWest.lng], [new Polyline(props.positions.latlng).getBounds().pad(0.2)._northEast.lat, new Polyline(props.positions.latlng).getBounds().pad(0.2)._northEast.lng]]
+    //const [bounds, setBounds] = useState([[new Polyline(props.positions.latlng).getBounds()._southWest.lat, new Polyline(props.positions.latlng).getBounds()._southWest.lng], [new Polyline(props.positions.latlng).getBounds()._northEast.lat, new Polyline(props.positions.latlng).getBounds()._northEast.lng]])
     const zoom = new Map(document.createElement("div"), {'center': [0, 0], 'zoom': 0}).fitBounds(new Polyline(props.positions.latlng).getBounds()).getZoom()
     const center = centroid(props.positions.latlng, EPSG3857)
 
@@ -49,7 +49,7 @@ export const ActivityMap = (props) => {
     const mapOptions = {
         zoomControl: false,
         minZoom: 1,
-        maxBounds: bounds,
+        //maxBounds: bounds,
         //maxBoundsViscosity: 1
     }
 
@@ -67,7 +67,6 @@ export const ActivityMap = (props) => {
                 mapLayers={mapLayers}
                 mapOptions={mapOptions}
                 mapShapes={mapShapes}
-                maxZoom={18}
                 zoom={zoom <= 18 ? zoom : 18}
             />
         </Pressable>
