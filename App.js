@@ -16,11 +16,12 @@ import {makeRedirectUri, useAuthRequest, exchangeCodeAsync, TokenResponse, refre
 import Feed from "./components/Feed";
 import {AntDesign} from '@expo/vector-icons';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Linking from 'expo-linking';
 
 const pwrdByStravaSmall = require("./assets/api_logo_pwrdBy_strava_stack_white.svg")
 const connectWithStrava = require("./assets/btn_strava_connectwith_orange.svg")
 const pwrdByStravaBig = require("./assets/api_logo_pwrdBy_strava_stack_light.svg")
-const demo = require('./assets/demo.jpg')
+const demo = require('./assets/demo.png')
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -73,14 +74,13 @@ export default function App() {
     );
 
     const handleLogout = async () => {
+        setCredentials({})
+        setLoggedIn(false)
         await fetch(`https://www.strava.com/oauth/deauthorize?access_token=${credentials.accessToken}`, {
             method: 'POST',
         });
 
         await AsyncStorage.removeItem("strava_credentials");
-        setCredentials({})
-        setLoggedIn(false)
-        setLoading(false)
     }
 
     useEffect(() => {
@@ -222,6 +222,20 @@ export default function App() {
                             justifyContent: "space-between"
                         }}>
                             <Text style={styles.title}>FastestX</Text>
+                            {!(loggedIn && !errorState) &&
+                                <Pressable
+                                    onPress={() => {
+                                        Linking.openURL("https://github.com/LeoHalb/FastestX")
+                                    }}
+                                    style={{marginRight: 16, justifyContent: 'center'}}
+                                >
+                                    <AntDesign
+                                        name="questioncircleo"
+                                        size={24}
+                                        color="black"
+                                    />
+                                </Pressable>
+                            }
                             {loggedIn && !errorState &&
                                 <>
                                     <Image
@@ -231,7 +245,18 @@ export default function App() {
                                     />
                                     <Pressable
                                         onPress={() => {
-                                            setLoading(true)
+                                            Linking.openURL("https://github.com/LeoHalb/FastestX")
+                                        }}
+                                        style={{marginRight: 16, justifyContent: 'center'}}
+                                    >
+                                        <AntDesign
+                                            name="questioncircleo"
+                                            size={24}
+                                            color="black"
+                                        />
+                                    </Pressable>
+                                    <Pressable
+                                        onPress={() => {
                                             handleLogout()
                                         }}
                                         style={{marginRight: 16, justifyContent: 'center'}}
