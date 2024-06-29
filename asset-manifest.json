@@ -1,12 +1,12 @@
 {
   "files": {
     "main.css": "/FastestX/static/css/main.98306781.css",
-    "main.js": "/FastestX/static/js/main.ece9afdd.js",
+    "main.js": "/FastestX/static/js/main.fd375c3f.js",
     "static/js/759.75af9f88.js": "/FastestX/static/js/759.75af9f88.js",
     "static/media/MaterialCommunityIcons.ttf": "/FastestX/static/media/MaterialCommunityIcons.5d42b4e60858731e7b65.ttf",
-    "static/media/demo.jpg": "/FastestX/static/media/demo.a225dedf09db6a0446c9.jpg",
     "static/media/Ionicons.ttf": "/FastestX/static/media/Ionicons.3517aeaa34b2f8cd8eef.ttf",
     "static/media/FontAwesome5_Solid.ttf": "/FastestX/static/media/FontAwesome5_Solid.07c3313b24f7b1ca85ee.ttf",
+    "static/media/demo.png": "/FastestX/static/media/demo.9c9a14b6fe0c3bd5f6ff.png",
     "static/media/FontAwesome5_Brands.ttf": "/FastestX/static/media/FontAwesome5_Brands.9e138496e8f1719c6ebf.ttf",
     "static/media/AntDesign.ttf": "/FastestX/static/media/AntDesign.163adab9dbd7cb1ed12a.ttf",
     "static/media/FontAwesome5_Regular.ttf": "/FastestX/static/media/FontAwesome5_Regular.1017bce89c72f95bcf8e.ttf",
@@ -22,12 +22,12 @@
     "manifest.json": "/FastestX/manifest.json",
     "serve.json": "/FastestX/serve.json",
     "main.98306781.css.map": "/FastestX/static/css/main.98306781.css.map",
-    "main.ece9afdd.js.map": "/FastestX/static/js/main.ece9afdd.js.map",
+    "main.fd375c3f.js.map": "/FastestX/static/js/main.fd375c3f.js.map",
     "759.75af9f88.js.map": "/FastestX/static/js/759.75af9f88.js.map"
   },
   "entrypoints": [
     "static/js/759.75af9f88.js",
     "static/css/main.98306781.css",
-    "static/js/main.ece9afdd.js"
+    "static/js/main.fd375c3f.js"
   ]
 }
